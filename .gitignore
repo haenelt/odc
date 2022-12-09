@@ -1,0 +1,15 @@
+# compiled bytecode
+*.pyc
+
+# jupyter notebook
+*.ipynb_checkpoints
+
+# pycharm project directory
+*.idea
+
+# vscode project directory
+*.vscode
+
+# coverage reports
+htmlcov/
+.coverage

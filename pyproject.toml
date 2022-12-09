@@ -3,7 +3,10 @@ name = "odc"
 version = "0.1.0"
 description = "Some analysis script for the ODC project"
 authors = ["Daniel Haenelt <daniel.haenelt@gmail.com>"]
+license = "GPLv3"
 readme = "README.md"
+repository = "https://github.com/haenelt/odc"
+keywords = ["fmri", "odc", "layer", "columns"]
 
 [tool.poetry.dependencies]
 python = "^3.10"
