@@ -14,6 +14,7 @@ numpy = "^1.24.1"
 matplotlib = "^3.6.2"
 nibabel = "^4.0.2"
 fmri-tools = {git = "https://github.com/haenelt/FmriTools", rev = "release-1.0.3"}
+joblib = "^1.2.0"
 
 [build-system]
 requires = ["poetry-core"]

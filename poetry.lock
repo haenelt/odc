@@ -875,7 +875,7 @@ python-versions = "*"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.10"
-content-hash = "6ba8508bf4328fcb8ed39a6a260d4df44e4644268b8de0a4045d4efd3c5d401e"
+content-hash = "29f70e042ac2620b47b5ed2013a8610928b1c12648ce4d73c1c56e7074f7ae50"
 
 [metadata.files]
 certifi = [
