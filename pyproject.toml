@@ -10,7 +10,10 @@ keywords = ["fmri", "odc", "layer", "columns"]
 
 [tool.poetry.dependencies]
 python = "^3.10"
-
+numpy = "^1.24.1"
+matplotlib = "^3.6.2"
+nibabel = "^4.0.2"
+fmri-tools = {git = "https://github.com/haenelt/FmriTools", rev = "release-1.0.3"}
 
 [build-system]
 requires = ["poetry-core"]
