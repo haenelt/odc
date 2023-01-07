@@ -127,3 +127,17 @@ class Data:
             / f"{hemi}.cnr_all_right_rest_{self.session}_layer_{layer}.mgh"
         )
         return (read_mgh(file_left)[0] + read_mgh(file_right)[0]) / 2
+
+    def get_rest(self, hemi, layer):
+        """Load resting-state data."""
+        name_rest = "resting_state2" if self.subj == "p4" else "resting_state"
+        file = (
+            self.DIR_BASE
+            / self.subj
+            / name_rest
+            / "ssw"
+            / "sampled"
+            / "nssw"
+            / f"{hemi}.nssw_layer_{layer}.mgh"
+        )
+        return read_mgh(file)[0]
