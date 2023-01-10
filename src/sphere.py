@@ -40,51 +40,51 @@ class Sphere:
         self.middle_point_cache = {}
 
         t = (1 + np.sqrt(5)) / 2  # golden ratio
-        self.vtx = np.array([self._vertex(-1, t, 0),
-                             self._vertex(1, t, 0),
-                             self._vertex(-1, -t, 0),
-                             self._vertex(1, -t, 0),
+        self.vtx = np.array(
+            [
+                self._vertex(-1, t, 0),
+                self._vertex(1, t, 0),
+                self._vertex(-1, -t, 0),
+                self._vertex(1, -t, 0),
+                self._vertex(0, -1, t),
+                self._vertex(0, 1, t),
+                self._vertex(0, -1, -t),
+                self._vertex(0, 1, -t),
+                self._vertex(t, 0, -1),
+                self._vertex(t, 0, 1),
+                self._vertex(-t, 0, -1),
+                self._vertex(-t, 0, 1),
+            ]
+        )
 
-                             self._vertex(0, -1, t),
-                             self._vertex(0, 1, t),
-                             self._vertex(0, -1, -t),
-                             self._vertex(0, 1, -t),
-
-                             self._vertex(t, 0, -1),
-                             self._vertex(t, 0, 1),
-                             self._vertex(-t, 0, -1),
-                             self._vertex(-t, 0, 1),
-                             ])
-
-        self.fac = np.array([
-            # 5 faces around point 0
-            [0, 11, 5],
-            [0, 5, 1],
-            [0, 1, 7],
-            [0, 7, 10],
-            [0, 10, 11],
-
-            # adjacent faces
-            [1, 5, 9],
-            [5, 11, 4],
-            [11, 10, 2],
-            [10, 7, 6],
-            [7, 1, 8],
-
-            # 5 faces around 3
-            [3, 9, 4],
-            [3, 4, 2],
-            [3, 2, 6],
-            [3, 6, 8],
-            [3, 8, 9],
-
-            # adjacent faces
-            [4, 9, 5],
-            [2, 4, 11],
-            [6, 2, 10],
-            [8, 6, 7],
-            [9, 8, 1],
-        ])
+        self.fac = np.array(
+            [
+                # 5 faces around point 0
+                [0, 11, 5],
+                [0, 5, 1],
+                [0, 1, 7],
+                [0, 7, 10],
+                [0, 10, 11],
+                # adjacent faces
+                [1, 5, 9],
+                [5, 11, 4],
+                [11, 10, 2],
+                [10, 7, 6],
+                [7, 1, 8],
+                # 5 faces around 3
+                [3, 9, 4],
+                [3, 4, 2],
+                [3, 2, 6],
+                [3, 6, 8],
+                [3, 8, 9],
+                # adjacent faces
+                [4, 9, 5],
+                [2, 4, 11],
+                [6, 2, 10],
+                [8, 6, 7],
+                [9, 8, 1],
+            ]
+        )
 
     def subdivide(self, subdiv):
         """Subdivide icosahedron by splitting each triangle into 4 smaller
@@ -114,24 +114,24 @@ class Sphere:
             self.fac = np.array(faces_subdiv)
 
     def _vertex(self, x, y, z):
-            """Normalize vertex coordinates and scale.
-            Parameters
-            ----------
-            x : float
-                x-coordinate.
-            y : float
-                y-coordinate.
-            z : float
-                z-coordinate.
-            Returns
-            -------
-            (3,) list
-                Scaled coordinates.
-            """
+        """Normalize vertex coordinates and scale.
+        Parameters
+        ----------
+        x : float
+            x-coordinate.
+        y : float
+            y-coordinate.
+        z : float
+            z-coordinate.
+        Returns
+        -------
+        (3,) list
+            Scaled coordinates.
+        """
 
-            length = np.sqrt(x ** 2 + y ** 2 + z ** 2)
+        length = np.sqrt(x**2 + y**2 + z**2)
 
-            return [(x * self.scale) / length for x in (x, y, z)]
+        return [(x * self.scale) / length for x in (x, y, z)]
 
     def _middle_point(self, ind1, ind2):
         """Find a middle point between two vertices and project to unit sphere.
@@ -152,7 +152,7 @@ class Sphere:
         smaller_index = min(ind1, ind2)
         greater_index = max(ind1, ind2)
 
-        key = '{0}-{1}'.format(smaller_index, greater_index)
+        key = "{0}-{1}".format(smaller_index, greater_index)
 
         if key in self.middle_point_cache:
             return self.middle_point_cache[key]

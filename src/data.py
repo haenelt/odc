@@ -15,6 +15,7 @@ class Data:
 
     @property
     def file_layer(self):
+        """Load layer files."""
         file_ = {}
         file_["lh"] = [
             str(self.DIR_BASE / self.subj / "anatomy" / "layer" / f"lh.layer_{i}")
@@ -28,6 +29,7 @@ class Data:
 
     @property
     def file_label(self):
+        """Load label files."""
         file_ = {}
         file_["lh"] = [
             str(self.DIR_BASE / self.subj / "anatomy" / "label" / "lh.fov.label"),
@@ -40,6 +42,7 @@ class Data:
         return file_
 
     def get_sample_data(self, layer):
+        """Load sample data from MVPA analysis."""
         file = (
             self.DIR_BASE
             / "paper"
