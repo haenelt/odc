@@ -3,6 +3,8 @@ from pathlib import Path
 
 from fmri_tools.io.surf import read_mgh
 
+from .config import N_LAYER
+
 
 @dataclass
 class Data:
@@ -11,7 +13,6 @@ class Data:
     subj: str
     session: str
     DIR_BASE = Path("/data/pt_01880/Experiment1_ODC/")
-    N_LAYER = 11
 
     @property
     def file_layer(self):
@@ -19,11 +20,11 @@ class Data:
         file_ = {}
         file_["lh"] = [
             str(self.DIR_BASE / self.subj / "anatomy" / "layer" / f"lh.layer_{i}")
-            for i in range(self.N_LAYER)
+            for i in range(N_LAYER)
         ]
         file_["rh"] = [
             str(self.DIR_BASE / self.subj / "anatomy" / "layer" / f"rh.layer_{i}")
-            for i in range(self.N_LAYER)
+            for i in range(N_LAYER)
         ]
         return file_
 
