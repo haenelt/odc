@@ -17,6 +17,7 @@ fmri-tools = {git = "https://github.com/haenelt/FmriTools", rev = "release-1.0.3
 fmri-decoder = {git = "https://github.com/haenelt/fmri-decoder", rev = "main"}
 joblib = "^1.2.0"
 pyarrow = "^10.0.1"
+ipykernel = "^6.20.1"
 
 [build-system]
 requires = ["poetry-core"]
