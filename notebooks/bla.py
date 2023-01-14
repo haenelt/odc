@@ -19,7 +19,6 @@ file_label2 = Path(DIR_BASE) / "p1" / "anatomy" / "label" / "lh.fov.label"
 label1 = read_label(file_label1)
 label2 = read_label(file_label2)
 label = np.intersect1d(label1, label2)
-label = np.sort(label)
 
 surf = load_mesh(surf_in)
 dist = load_mmap(dist_in)
