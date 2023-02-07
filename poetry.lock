@@ -740,6 +740,14 @@ optional = false
 python-versions = ">=3.7"
 
 [[package]]
+name = "palettable"
+version = "3.3.0"
+description = "Color palettes for Python"
+category = "main"
+optional = false
+python-versions = "*"
+
+[[package]]
 name = "pandas"
 version = "1.5.2"
 description = "Powerful data structures for data analysis, time series, and statistics"
@@ -1303,7 +1311,7 @@ python-versions = "*"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.10"
-content-hash = "5cde549407e8d68d242bcfe475ceb53b150fc52b76258a0e0be4320d90c6f84b"
+content-hash = "2bcdc6afc48ff54506a51c9f4ac32b9fa8bc21b5201482b8e3a13ce8de8bb16b"
 
 [metadata.files]
 appnope = [
@@ -2008,6 +2016,10 @@ opencv-python = [
 packaging = [
     {file = "packaging-23.0-py3-none-any.whl", hash = "sha256:714ac14496c3e68c99c29b00845f7a2b85f3bb6f1078fd9f72fd20f0570002b2"},
     {file = "packaging-23.0.tar.gz", hash = "sha256:b6ad297f8907de0fa2fe1ccbd26fdaf387f5f47c7275fedf8cce89f99446cf97"},
+]
+palettable = [
+    {file = "palettable-3.3.0-py2.py3-none-any.whl", hash = "sha256:c3bf3f548fc228e86bd3d16928bbf8d621c1d1098791ceab446d0e3a5e1298d1"},
+    {file = "palettable-3.3.0.tar.gz", hash = "sha256:72feca71cf7d79830cd6d9181b02edf227b867d503bec953cf9fa91bf44896bd"},
 ]
 pandas = [
     {file = "pandas-1.5.2-cp310-cp310-macosx_10_9_universal2.whl", hash = "sha256:e9dbacd22555c2d47f262ef96bb4e30880e5956169741400af8b306bbb24a273"},
