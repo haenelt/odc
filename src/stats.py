@@ -4,17 +4,28 @@
 import numpy as np
 
 
-def bootstrap(x, Nboot, statfun):
+def bootstrap(x, Nboot=1000, statfun=np.mean):
     """Calculate bootstrap statistics for a sample x"""
     x = np.array(x)
 
     resampled_stat = []
-    for k in range(Nboot):
+    for _ in range(Nboot):
         index = np.random.randint(0, len(x), len(x))  # with replacement
         sample = x[index]
         resampled_stat.append(statfun(sample))
 
     return resampled_stat
+
+
+data = np.random.normal(loc=1.0, scale=0.5, size=1000)
+
+bla = bootstrap(data)
+
+
+import matplotlib.pyplot as plt
+
+plt.hist(bla)
+plt.show()
 
 
 # https://www.gs.washington.edu/academics/courses/akey/56008/lecture/lecture10.pdf
@@ -49,3 +60,5 @@ def bootstrap(x, Nboot, statfun):
 # two-tailed p-value: counter data >= and <= mean
 # compare counted val to 0.05
 # if >= 0.05 -> fail rejection
+data_demeaned = data - np.mean(data)
+data_bootstrap = bootstrap(data_demeaned)
