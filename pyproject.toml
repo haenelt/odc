@@ -19,6 +19,7 @@ joblib = "^1.2.0"
 pyarrow = "^10.0.1"
 ipykernel = "^6.20.1"
 palettable = "^3.3.0"
+statsmodels = "^0.13.5"
 
 [build-system]
 requires = ["poetry-core"]

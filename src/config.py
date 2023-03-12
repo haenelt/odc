@@ -5,6 +5,7 @@ import multiprocessing
 
 NUM_CORES = multiprocessing.cpu_count()
 
+SUBJECTS = ["p1", "p2", "p3", "p4", "p5"]
 N_LAYER = 11
 
 SESSION: dict[str, dict] = {}
