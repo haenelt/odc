@@ -12,10 +12,12 @@ class Sphere:
     further refined to a sphere by subdivision of triangles. The center point of
     the sphere is in the origin of the coordinate system. The code for
     subdivision is largely taken from [1]_.
+
     Parameters
     ----------
     scale : float
         Radius of sphere in px.
+
     Attributes
     ----------
     subdiv : int
@@ -26,6 +28,7 @@ class Sphere:
         Array of vertex coordinates.
     fac : (N,3) np.ndarray
         Array of corresponding faces.
+
     References
     ----------
     .. [1] https://sinestesia.co/blog/tutorials/python-icospheres/
@@ -33,7 +36,6 @@ class Sphere:
     """
 
     def __init__(self, scale=1):
-
         self.scale = scale
         self.subdiv = 0
         self.arr_f = None
@@ -89,12 +91,12 @@ class Sphere:
     def subdivide(self, subdiv):
         """Subdivide icosahedron by splitting each triangle into 4 smaller
         triangles.
+
         Parameters
         ----------
         subdiv : int
             Number of subdivision iterations.
         """
-
         self.subdiv += subdiv
         self.middle_point_cache = {}
 
@@ -115,6 +117,7 @@ class Sphere:
 
     def _vertex(self, x, y, z):
         """Normalize vertex coordinates and scale.
+
         Parameters
         ----------
         x : float
@@ -123,30 +126,31 @@ class Sphere:
             y-coordinate.
         z : float
             z-coordinate.
+
         Returns
         -------
         (3,) list
             Scaled coordinates.
         """
-
         length = np.sqrt(x**2 + y**2 + z**2)
 
         return [(x * self.scale) / length for x in (x, y, z)]
 
     def _middle_point(self, ind1, ind2):
         """Find a middle point between two vertices and project to unit sphere.
+
         Parameters
         ----------
         ind1 : int
             Index of vertex 1.
         ind2 : int
             Index of vertex 2.
+
         Returns
         -------
         index : int
             Index of created middle point.
         """
-
         # We check if we have already cut this edge first to avoid duplicated
         # vertices
         smaller_index = min(ind1, ind2)

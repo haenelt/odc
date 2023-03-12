@@ -1,3 +1,6 @@
+# -*- coding: utf-8 -*-
+"""Some constants."""
+
 import multiprocessing
 
 NUM_CORES = multiprocessing.cpu_count()

@@ -1,3 +1,6 @@
+# -*- coding: utf-8 -*-
+"""Filepaths to data."""
+
 from dataclasses import dataclass
 from pathlib import Path
 
