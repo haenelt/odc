@@ -141,6 +141,7 @@ def permutation_test(t, null_dist):
         Test statistics.
     null_dist : (N,) np.ndarray
         Null distribution.
+    
     Returns
     -------
     p : float
