@@ -8,7 +8,7 @@ lines.linewidth: 2
 lines.markersize: 2
 
 ### Legend
-legend.fontsize: 12
+legend.fontsize: 22
 legend.loc: upper left
 legend.frameon: False
 legend.scatterpoints: 1
@@ -16,28 +16,28 @@ legend.scatterpoints: 1
 ### TICKS
 xtick.direction: out
 ytick.direction: out
-xtick.labelsize: 14
-ytick.labelsize: 14
-xtick.major.size: 8
-ytick.major.size: 8
+xtick.labelsize: 24
+ytick.labelsize: 24
+xtick.major.size: 14
+ytick.major.size: 14
 
 ### FONTS
 font.family: sans-serif
 font.sans-serif: sans-serif, Roboto, 'Avenir', Arial, Helvetica
 font.weight: normal
-font.size: 18
+font.size: 22
 
 ### AXES
 axes.grid: True
 axes.facecolor: white
 axes.linewidth: 1.0
-axes.labelsize: 16
+axes.labelsize: 26
 axes.spines.top: False
 axes.spines.right: False
 axes.prop_cycle: cycler('color', ['1990BE', 'A12A48', 'C76216', '57B154'])
 
 ### GRIDS
-grid.linewidth: 0.5     
+grid.linewidth: 2
 grid.alpha: 0.24
 
 ### SAVING FIGURES
