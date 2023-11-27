@@ -1,9 +1,8 @@
-- [ ] repeatability between sessions across cortical depth
+- [x] repeatability between sessions across cortical depth
 - [ ] show: univariate maps across layers
 - [ ] columnarity index in V1 and V2
 - [ ] layer profiles and layer mvpa for not-nulled time series
 - [ ] show: tsnr, slab position
-- [ ] mvpa analysis with same surface coordinates
 - [ ] partial volume of v3 vertices with v1
 - [ ] test for significance
 - [ ] analysis with bandpass-filtered data
