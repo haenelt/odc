@@ -1,0 +1,7 @@
+numpy
+matplotlib
+nibabel
+scipy
+fmri_tools @ git+https://github.com/haenelt/FmriTools.git@release-1.0.3#egg=fmri_tools
+ipykernel
+palettable
