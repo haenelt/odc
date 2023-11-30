@@ -6,4 +6,4 @@
 - [ ] partial volume of v3 vertices with v1
 - [ ] test for significance
 - [ ] analysis with bandpass-filtered data
-- [ ] cortical profile of signal changes with different number of vertices
+- [x] cortical profile of signal changes with different number of vertices
