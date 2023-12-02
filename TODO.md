@@ -1,7 +1,7 @@
 - [x] repeatability between sessions across cortical depth
 - [ ] show: univariate maps across layers
 - [x] layer profiles and layer mvpa for not-nulled time series
-- [ ] show: tsnr, slab position
+- [x] show: tsnr, slab position
 - [ ] partial volume of v3 vertices with v1
 - [ ] test for significance
 - [x] analysis with bandpass-filtered data (0.025, 0.5, 0.1, 0.5)
