@@ -5,6 +5,8 @@ import functools
 
 import numpy as np
 
+__all__ = ["Bootstrap", "fdr_correction", "permutation_test"]
+
 
 class Bootstrap:
     """Bootstrap statistics.
@@ -141,7 +143,7 @@ def permutation_test(t, null_dist):
         Test statistics.
     null_dist : (N,) np.ndarray
         Null distribution.
-    
+
     Returns
     -------
     p : float

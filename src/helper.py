@@ -11,6 +11,8 @@ from tqdm import tqdm
 from .config import SESSION
 from .data import Data
 
+__all__ = ["get_composed_label"]
+
 
 def get_composed_label(file_out, file_in, file_in2, file_ind2, file_ind3):
     """This function gets the index array of mgh files in the deformed surface mesh to

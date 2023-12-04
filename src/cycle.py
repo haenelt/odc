@@ -8,6 +8,8 @@ import pandas as pd
 
 from .config import N_LAYER, SESSION, SUBJECTS
 
+__all__ = ["GetProfile"]
+
 
 class GetProfile:
     """
@@ -66,7 +68,9 @@ class GetProfile:
 
     def _get_data_scale(self, subj, day, layer):
         """Load data for scale."""
-        path = Path(self.dir_scale) / subj / f"{self.sess}{SESSION[subj][self.sess][day]}"
+        path = (
+            Path(self.dir_scale) / subj / f"{self.sess}{SESSION[subj][self.sess][day]}"
+        )
         file1 = path / f"lh.spatial_scale_layer_{layer}.npy"
         file2 = path / f"rh.spatial_scale_layer_{layer}.npy"
         data1 = np.load(file1, allow_pickle=True).flat[0]
@@ -75,7 +79,9 @@ class GetProfile:
 
     def _get_data_filter(self, subj, day, layer):
         """Load data for filter."""
-        path = Path(self.dir_filter) / subj / f"{self.sess}{SESSION[subj][self.sess][day]}"
+        path = (
+            Path(self.dir_filter) / subj / f"{self.sess}{SESSION[subj][self.sess][day]}"
+        )
         file1 = path / f"lh.filter_bank_layer_{layer}.parquet"
         file2 = path / f"rh.filter_bank_layer_{layer}.parquet"
         data1 = pd.read_parquet(file1)

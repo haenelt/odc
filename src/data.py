@@ -8,6 +8,8 @@ from fmri_tools.io.surf import read_mgh
 
 from .config import N_LAYER
 
+__all__ = ["Data"]
+
 
 @dataclass
 class Data:
