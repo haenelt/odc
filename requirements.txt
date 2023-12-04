@@ -7,3 +7,4 @@ palettable
 fmri_decoder @ git+https://github.com/haenelt/fmri-decoder.git@main#egg=fmri_decoder
 pymc
 arviz
+graphviz
