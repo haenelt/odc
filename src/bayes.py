@@ -15,9 +15,11 @@ from src.config import DIR_DATA, N_LAYER, SESSION, SUBJECTS
 
 plt.style.use(os.path.join(os.path.dirname(__file__), "default.mplstyle"))
 
+__all__ = ["LinearModel", "SineModel"]
+
 
 class LinearModel:
-    """Regression model using Bayesian inference.
+    """Linear regression model using Bayesian inference.
 
     Parameters
     ----------
@@ -61,8 +63,8 @@ class LinearModel:
         if self.init:
             raise ValueError("Model already initialized!")
         with self.model:
-            b0 = pm.Normal("b0", mu=0, sigma=100)
-            b1 = pm.Normal("b1", mu=0, sigma=100)
+            b0 = pm.Normal("b0", mu=0, sigma=100)  # interception
+            b1 = pm.Normal("b1", mu=0, sigma=100)  # slope
 
             # define Linear model
             yest = self._fun(self.x, (b0, b1), "pymc")
@@ -81,7 +83,7 @@ class LinearModel:
             self.init_model()
         with self.model:
             self.trace = pm.sample(
-                draws=4000,
+                draws=10000,
                 tune=500,
                 chains=4,
                 target_accept=0.95,
@@ -212,16 +214,31 @@ class LinearModel:
         return cls(x, y, group)
 
 
-class CosineModel(LinearModel):
+class SineModel(LinearModel):
+    """Regression model of a sine function using Bayesian inference.
+
+    Parameters
+    ----------
+    x : (N,) np.ndarray
+        Array of cortical layers.
+    y : (N,) np.ndarray
+        Array of corresponding decoding accuracies in %.
+    group : (N,) np.ndarray
+        Array of corresponding integers indicating from which subject the data was
+        pooled. Note that in the current version, this parameter is neglected, since
+        a pooled Bayesian model is applied.
+
+    """
+
     def init_model(self):
         """Initialize pymc model. This method therefore contains the prior settings."""
         with self.model:
-            b0 = pm.Normal("b0", mu=0, sigma=100)
-            b1 = pm.Normal("b1", mu=0, sigma=100)
-            b2 = pm.Normal("b2", mu=0, sigma=100)
-            b3 = pm.Normal("b3", mu=0, sigma=100)
+            b0 = pm.Normal("b0", mu=0, sigma=100)  # interception
+            b1 = pm.Normal("b1", mu=np.pi / 2, sigma=np.pi / 2)  # lag
+            b2 = pm.Normal("b2", mu=0.2, sigma=0.01)  # frequency
+            b3 = pm.Normal("b3", mu=1, sigma=1)  # amplitude
 
-            # define Cosine model
+            # define sine model
             yest = self._fun(self.x, (b0, b1, b2, b3), "pymc")
 
             # define Normal likelihood with HalfCauchy noise (fat tails, equiv to HalfT 1DoF)
@@ -249,8 +266,8 @@ class CosineModel(LinearModel):
         """Plot resulting data fit."""
         if self.trace is None:
             raise ValueError("No sampling done!")
-        b1 = np.mean(self.trace.posterior.b1.to_numpy(), axis=0)
         b0 = np.mean(self.trace.posterior.b0.to_numpy(), axis=0)
+        b1 = np.mean(self.trace.posterior.b1.to_numpy(), axis=0)
         b2 = np.mean(self.trace.posterior.b2.to_numpy(), axis=0)
         b3 = np.mean(self.trace.posterior.b3.to_numpy(), axis=0)
         _params = (b0, b1, b2, b3)
@@ -260,8 +277,13 @@ class CosineModel(LinearModel):
     def _fun(x, params, backend="numpy"):
         """Define regression function."""
         if backend == "numpy":
-            return params[3] * np.cos(params[2] * x - params[1]) + params[0]
+            return (
+                params[3] * np.sin(2 * np.pi * params[2] * (x - params[1])) + params[0]
+            )
         elif backend == "pymc":
-            return params[3] * pm.math.cos(params[2] * x - params[1]) + params[0]
+            return (
+                params[3] * pm.math.sin(2 * np.pi * params[2] * (x - params[1]))
+                + params[0]
+            )
         else:
             raise ValueError("Unknown backend!")
