@@ -193,10 +193,10 @@ class LinearModel:
 
     @classmethod
     def from_data(cls, sess):
-        """Read my data from disk."""
-        x = []
-        y = []
-        group = []
+        """Read my data from disk. Data from both sessions are averaged."""
+        x = {"0": [], "1": []}
+        y = {"0": [], "1": []}
+        group = {"0": [], "1": []}
         for i, subj in enumerate(SUBJECTS):
             for day in [0, 1]:
                 path = Path(DIR_DATA) / subj / f"{sess}{SESSION[subj][sess][day]}"
@@ -204,14 +204,15 @@ class LinearModel:
                 data = np.genfromtxt(file, delimiter=",")
                 data = np.mean(data, axis=1)
 
-                x.extend(np.arange(N_LAYER))
-                y.extend(data * 100)
-                group.extend(i * np.ones_like(data, dtype=np.int64))
-        x = np.array(x)
-        y = np.array(y)
-        group = np.array(group, dtype=np.int64)
+                x[str(day)].extend(np.arange(N_LAYER))
+                y[str(day)].extend(data * 100)
+                group[str(day)].extend(i * np.ones_like(data, dtype=np.int64))
+        x_mean = (np.array(x["0"]) + np.array(x["1"])) / 2
+        y_mean = (np.array(y["0"]) + np.array(y["1"])) / 2
+        group_mean = (np.array(group["0"]) + np.array(group["1"])) / 2
+        group_mean = np.array(group, dtype=np.int64)
 
-        return cls(x, y, group)
+        return cls(x_mean, y_mean, group_mean)
 
 
 class SineModel(LinearModel):
@@ -234,9 +235,9 @@ class SineModel(LinearModel):
         """Initialize pymc model. This method therefore contains the prior settings."""
         with self.model:
             b0 = pm.Normal("b0", mu=0, sigma=100)  # interception
-            b1 = pm.Normal("b1", mu=np.pi / 2, sigma=np.pi / 2)  # lag
+            b1 = pm.Normal("b1", mu=np.pi / 2, sigma=np.pi / 8)  # lag
             b2 = pm.Normal("b2", mu=0.2, sigma=0.01)  # frequency
-            b3 = pm.Normal("b3", mu=1, sigma=1)  # amplitude
+            b3 = pm.Normal("b3", mu=0, sigma=100)  # amplitude
 
             # define sine model
             yest = self._fun(self.x, (b0, b1, b2, b3), "pymc")
