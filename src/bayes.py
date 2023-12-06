@@ -210,7 +210,7 @@ class LinearModel:
         x_mean = (np.array(x["0"]) + np.array(x["1"])) / 2
         y_mean = (np.array(y["0"]) + np.array(y["1"])) / 2
         group_mean = (np.array(group["0"]) + np.array(group["1"])) / 2
-        group_mean = np.array(group, dtype=np.int64)
+        group_mean = np.array(group_mean, dtype=np.int64)
 
         return cls(x_mean, y_mean, group_mean)
 
