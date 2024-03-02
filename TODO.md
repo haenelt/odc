@@ -6,3 +6,6 @@
 - [x] test for significance
 - [x] analysis with bandpass-filtered data (0.025, 0.5, 0.1, 0.5)
 - [x] cortical profile of signal changes with different number of vertices
+- [ ] create new V1/V2/V3 labels with neuropythy
+- [ ] feature selection with mean cortical profile
+- [ ] decoding with radius parameter
