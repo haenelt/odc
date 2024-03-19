@@ -8,7 +8,7 @@ fmri_decoder @ git+https://github.com/haenelt/fmri-decoder.git@main#egg=fmri_dec
 pymc
 arviz
 graphviz
-fmri-tools @ git+https://github.com/haenelt/FmriTools.git@release-1.0.3#egg=fmri_tools
+fmri_tools @ git+https://github.com/haenelt/FmriTools@release-1.0.3
 joblib
 pyarrow
 statsmodels

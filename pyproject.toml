@@ -20,7 +20,7 @@ fmri-decoder = {git = "https://github.com/haenelt/fmri-decoder", rev = "main"}
 pymc = "^5.10.4"
 arviz = "^0.17.0"
 graphviz = "^0.20.1"
-fmri-tools = {git = "https://github.com/haenelt/FmriTools", rev = "release-1.0.3"}
+fmri_tools = {git = "https://github.com/haenelt/FmriTools", rev = "release-1.0.3"}
 joblib = "^1.2.0"
 pyarrow = "^10.0.1"
 statsmodels = "^0.13.5"

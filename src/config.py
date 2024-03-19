@@ -11,7 +11,7 @@ DIR_CACHE = "/data/pt_01880/Experiment1_ODC/cache"
 SUBJECTS = ["p1", "p2", "p3", "p4", "p5"]
 N_LAYER = 11
 
-SESSION: dict[str, dict] = {}
+SESSION = {}
 SESSION["p1"] = {}
 SESSION["p1"]["GE_EPI"] = [3, 4]
 SESSION["p1"]["SE_EPI"] = [1, 2]
