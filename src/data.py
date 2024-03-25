@@ -54,10 +54,11 @@ class Data:
         file = (
             self.DIR_BASE
             / "paper"
+            / "v2.0"
             / "decoding"
             / self.subj
             / self.session
-            / "bandpass_none"
+            / "v1_bandpass_none"
             / "sample"
             / f"sample_data_{layer}.parquet"
         )

@@ -200,7 +200,7 @@ class LinearModel:
         for i, subj in enumerate(SUBJECTS):
             for day in [0, 1]:
                 path = Path(DIR_DATA) / subj / f"{sess}{SESSION[subj][sess][day]}"
-                file = path / "bandpass_none" / "accuracy.csv"
+                file = path / "v1_bandpass_none" / "accuracy.csv"
                 data = np.genfromtxt(file, delimiter=",")
                 data = np.mean(data, axis=1)
 
