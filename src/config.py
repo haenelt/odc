@@ -9,6 +9,7 @@ DIR_BASE = "/data/pt_01880/Experiment1_ODC"
 DIR_DATA = "/data/pt_01880/Experiment1_ODC/paper/decoding"  # decoding results
 SUBJECTS = ["p1", "p2", "p3", "p4", "p5"]
 N_LAYER = 11
+N_RUN = 10
 
 SESSION: dict[str, dict] = {}
 SESSION["p1"] = {}
