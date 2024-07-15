@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Filepaths to (reprocessed) data."""
+"""Some reprocessing for reviewer."""
 
 import functools
 import re
@@ -176,7 +176,9 @@ class FeatureSelect:
         self.area = area
         self.data = Data(self.subj, self.sess, self.day, self.area)
         self.label, self.hemi = self.get_label
-        self.label_sorted, self.hemi_sorted = zip(*[self.sort_features(i) for i in range(N_LAYER)])
+        self.label_sorted, self.hemi_sorted = zip(
+            *[self.sort_features(i) for i in range(N_LAYER)]
+        )
 
     @property
     @functools.lru_cache()
@@ -216,6 +218,8 @@ class FeatureSelect:
 
 
 class RunMVPA:
+    """Decoding analysis with shared features across cortical depth."""
+
     def __init__(self, dir_out, subj, seq, day, area, feature_layer=5):
         self.subj = subj
         self.seq = seq
@@ -309,3 +313,40 @@ class RunMVPA:
             mvpa.save_results(self.dir_out / "sensitivity.csv", "sensitivity")
             mvpa.save_results(self.dir_out / "specificity.csv", "specificity")
             mvpa.save_results(self.dir_out / "f1.csv", "f1")
+
+
+if __name__ == "__main__":
+    import argparse
+    from .config import SUBJECTS
+
+    # add argument
+    parser = argparse.ArgumentParser(description="Run MVPA.")
+    parser.add_argument("--out", dest="out", type=str, help="Output base directory.")
+    parser.add_argument(
+        "--area",
+        dest="area",
+        default="v1",
+        type=str,
+        help="Cortical area from which features are selected.",
+    )
+    parser.add_argument(
+        "--flayer",
+        dest="feature_layer",
+        default=5,
+        type=int,
+        help="Layer from which features are selected.",
+    )
+    args = parser.parse_args()
+
+    for subj in SUBJECTS:
+        for seq in ["GE_EPI", "SE_EPI", "VASO"]:
+            for day in range(2):
+                print(f"Running: subj -> {subj}, sequence -> {seq}, day -> {day}")
+                dir_out = (
+                    Path(args.out)
+                    / subj
+                    / Data(subj, seq, day, args.area).sess
+                    / f"{args.area}_bandpass_none"
+                )
+                mvpa = RunMVPA(dir_out, subj, seq, day, args.area, args.feature_layer)
+                mvpa.decoding()
