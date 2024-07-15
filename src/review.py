@@ -338,6 +338,10 @@ if __name__ == "__main__":
     )
     args = parser.parse_args()
 
+    # check arguments
+    print(f"AREA: {args.area}")
+    print(f"FEATURE LAYER: {args.feature_layer}")
+
     for subj in SUBJECTS:
         for seq in ["GE_EPI", "SE_EPI", "VASO"]:
             for day in range(2):
