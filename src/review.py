@@ -4,16 +4,15 @@
 import functools
 import re
 from pathlib import Path
-import pandas as pd
-from sklearn.feature_selection import f_classif
+
 import numpy as np
+import pandas as pd
 from fmri_decoder.data import DataConfig, ModelConfig, SurfaceData, TimeseriesData
 from fmri_decoder.model import MVPA
-from fmri_decoder.preprocessing import (
-    TimeseriesPreproc,
-    TimeseriesSampling,
-)
-from .config import SESSION, DIR_BASE, N_LAYER, N_RUN
+from fmri_decoder.preprocessing import TimeseriesPreproc, TimeseriesSampling
+from sklearn.feature_selection import f_classif
+
+from .config import DIR_BASE, N_LAYER, N_RUN, SESSION
 
 __all__ = ["Data", "FeatureSelect", "RunMVPA"]
 
@@ -170,14 +169,14 @@ class Data:
 class FeatureSelect:
     """Select features based on an already sampled data set."""
 
-    def __init__(self, subj, sess, day, area, layer):
+    def __init__(self, subj, sess, day, area):
         self.subj = subj
         self.sess = sess
         self.day = day
         self.area = area
         self.data = Data(self.subj, self.sess, self.day, self.area)
         self.label, self.hemi = self.get_label
-        self.label_sorted, self.hemi_sorted = self.sort_features(layer)
+        self.label_sorted, self.hemi_sorted = zip(*[self.sort_features(i) for i in range(N_LAYER)])
 
     @property
     @functools.lru_cache()
@@ -259,9 +258,7 @@ class RunMVPA:
     @property
     @functools.lru_cache()
     def feature_selection(self):
-        features = FeatureSelect(
-            self.subj, self.seq, self.day, self.area, self.feature_layer
-        )
+        features = FeatureSelect(self.subj, self.seq, self.day, self.area)
         _features_selected = {
             "hemi": features.hemi_sorted[self.feature_layer][: self.config_model.nmax],
             "label": features.label_sorted[self.feature_layer][
