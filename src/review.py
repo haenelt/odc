@@ -170,16 +170,14 @@ class Data:
 class FeatureSelect:
     """Select features based on an already sampled data set."""
 
-    def __init__(self, subj, sess, day, area):
+    def __init__(self, subj, sess, day, area, layer):
         self.subj = subj
         self.sess = sess
         self.day = day
         self.area = area
         self.data = Data(self.subj, self.sess, self.day, self.area)
         self.label, self.hemi = self.get_label
-        self.label_sorted, self.hemi_sorted = zip(
-            *[self.sort_features(i) for i in range(N_LAYER)]
-        )
+        self.label_sorted, self.hemi_sorted = self.sort_features(layer)
 
     @property
     @functools.lru_cache()
@@ -261,7 +259,9 @@ class RunMVPA:
     @property
     @functools.lru_cache()
     def feature_selection(self):
-        features = FeatureSelect(self.subj, self.seq, self.day, self.area)
+        features = FeatureSelect(
+            self.subj, self.seq, self.day, self.area, self.feature_layer
+        )
         _features_selected = {
             "hemi": features.hemi_sorted[self.feature_layer][: self.config_model.nmax],
             "label": features.label_sorted[self.feature_layer][
