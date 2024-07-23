@@ -298,7 +298,15 @@ class RunMVPA:
                     file_deformation, file_reference
                 )
 
-            mvpa = MVPA.from_selected_data(data_sampled, self.feature_selection, events)
+            for hemi in ["lh", "rh"]:
+                label = self.surf_data.load_label_intersection(hemi)
+                data_sampled[hemi] = [
+                    data_sampled[hemi][x][label, :] for x in range(len(data_sampled[hemi]))
+                ]
+            
+            mvpa = MVPA.from_data(
+                data_sampled, events, nmax=self.config_model.nmax, remove_nan=True
+            )
 
             # model preparation and fitting
             # scaling
@@ -317,11 +325,11 @@ class RunMVPA:
 
 if __name__ == "__main__":
     import argparse
-    from .config import SUBJECTS
 
     # add argument
     parser = argparse.ArgumentParser(description="Run MVPA.")
     parser.add_argument("--out", dest="out", type=str, help="Output base directory.")
+    parser.add_argument("--subj", dest="subj", type=str, help="Subject name.")
     parser.add_argument(
         "--area",
         dest="area",
@@ -342,15 +350,14 @@ if __name__ == "__main__":
     print(f"AREA: {args.area}")
     print(f"FEATURE LAYER: {args.feature_layer}")
 
-    for subj in SUBJECTS:
-        for seq in ["GE_EPI", "SE_EPI", "VASO"]:
-            for day in range(2):
-                print(f"Running: subj -> {subj}, sequence -> {seq}, day -> {day}")
-                dir_out = (
-                    Path(args.out)
-                    / subj
-                    / Data(subj, seq, day, args.area).sess
-                    / f"{args.area}_bandpass_none"
-                )
-                mvpa = RunMVPA(dir_out, subj, seq, day, args.area, args.feature_layer)
-                mvpa.decoding()
+    for seq in ["GE_EPI", "SE_EPI", "VASO"]:
+        for day in range(2):
+            print(f"Running: subj -> {args.subj}, sequence -> {seq}, day -> {day}")
+            dir_out = (
+                Path(args.out)
+                / args.subj
+                / Data(args.subj, seq, day, args.area).sess
+                / f"{args.area}_bandpass_none"
+            )
+            mvpa = RunMVPA(dir_out, args.subj, seq, day, args.area, args.feature_layer)
+            mvpa.decoding()
