@@ -323,7 +323,9 @@ class RunMVPA:
                     for x in range(len(data_feature_sampled[hemi]))
                 ]
 
-            print(f"hallo: {data_sampled==data_feature_sampled}")
+            print(
+                f"hallo: {compare_dicts_with_arrays(data_sampled, data_feature_sampled)}"
+            )
 
             # mvpa = MVPA.from_data(
             #    data_sampled, events, nmax=self.config_model.nmax, remove_nan=True
@@ -349,6 +351,29 @@ class RunMVPA:
             mvpa.save_results(self.dir_out / "sensitivity.csv", "sensitivity")
             mvpa.save_results(self.dir_out / "specificity.csv", "specificity")
             mvpa.save_results(self.dir_out / "f1.csv", "f1")
+
+
+def compare_dicts_with_arrays(dict1, dict2):
+    """
+    Compare two dictionaries that contain arrays of numbers.
+
+    Args:
+        dict1 (dict): First dictionary to compare.
+        dict2 (dict): Second dictionary to compare.
+
+    Returns:
+        bool: True if both dictionaries are equal, False otherwise.
+    """
+    # Check if both dictionaries have the same keys
+    if dict1.keys() != dict2.keys():
+        return False
+
+    # Check if the arrays for each key are equal
+    for key in dict1:
+        if not np.array_equal(dict1[key], dict2[key]):
+            return False
+
+    return True
 
 
 if __name__ == "__main__":
