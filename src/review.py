@@ -323,16 +323,16 @@ class RunMVPA:
                     for x in range(len(data_feature_sampled[hemi]))
                 ]
 
-            mvpa = MVPA.from_data(
-                data_sampled, events, nmax=self.config_model.nmax, remove_nan=True
-            )
-            # mvpa = ExternalFeatureMVPA.from_data(
-            #    data_sampled,
-            #    data_feature_sampled,
-            #    events,
-            #    nmax=self.config_model.nmax,
-            #    remove_nan=True,
+            # mvpa = MVPA.from_data(
+            #    data_sampled, events, nmax=self.config_model.nmax, remove_nan=True
             # )
+            mvpa = ExternalFeatureMVPA.from_data(
+                data_sampled,
+                data_feature_sampled,
+                events,
+                nmax=self.config_model.nmax,
+                remove_nan=True,
+            )
 
             # model preparation and fitting
             # scaling
