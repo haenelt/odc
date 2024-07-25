@@ -308,11 +308,11 @@ class RunMVPA:
             data_feature_sampled = {}
             for hemi in ["lh", "rh"]:
                 vtx, fac = self.surf_data.load_layer(hemi, self.feature_layer)
-                sampler = TimeseriesSampling(vtx, fac, data_vol)
+                sampler2 = TimeseriesSampling(vtx, fac, data_vol)
                 # sample time series
                 file_deformation = self.config_data.file_deformation
                 file_reference = self.time_data.file_series[0]
-                data_feature_sampled[hemi] = sampler.sample_timeseries(
+                data_feature_sampled[hemi] = sampler2.sample_timeseries(
                     file_deformation, file_reference
                 )
 
