@@ -323,7 +323,7 @@ class RunMVPA:
                     for x in range(len(data_feature_sampled[hemi]))
                 ]
 
-            print(f"hallo: {data_sampled==data_feature_sampled}) 
+            print(f"hallo: {data_sampled==data_feature_sampled}")
 
             # mvpa = MVPA.from_data(
             #    data_sampled, events, nmax=self.config_model.nmax, remove_nan=True
