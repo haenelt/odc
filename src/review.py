@@ -277,7 +277,7 @@ class RunMVPA:
         # timeseries preprocessing
         preproc = TimeseriesPreproc.from_dict(self.config)
         # detrend time series
-        _ = preproc.detrend_timeseries(self.config_data.tr, self.config_data.cutoff_sec)
+        # _ = preproc.detrend_timeseries(self.config_data.tr, self.config_data.cutoff_sec)
         # crop time series
         data_vol, events = preproc.crop_data(self.config_data.n_skip)
         return data_vol, events
