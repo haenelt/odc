@@ -8,7 +8,7 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 from fmri_decoder.data import DataConfig, ModelConfig, SurfaceData, TimeseriesData
-from fmri_decoder.model import MVPA
+from fmri_decoder.model import ExternalFeatureMVPA
 from fmri_decoder.preprocessing import TimeseriesPreproc, TimeseriesSampling
 from sklearn.feature_selection import f_classif
 
@@ -301,11 +301,34 @@ class RunMVPA:
             for hemi in ["lh", "rh"]:
                 label = self.surf_data.load_label_intersection(hemi)
                 data_sampled[hemi] = [
-                    data_sampled[hemi][x][label, :] for x in range(len(data_sampled[hemi]))
+                    data_sampled[hemi][x][label, :]
+                    for x in range(len(data_sampled[hemi]))
                 ]
-            
-            mvpa = MVPA.from_data(
-                data_sampled, events, nmax=self.config_model.nmax, remove_nan=True
+
+            data_feature_sampled = {}
+            for hemi in ["lh", "rh"]:
+                vtx, fac = self.surf_data.load_layer(hemi, self.feature_layer)
+                sampler = TimeseriesSampling(vtx, fac, data_vol)
+                # sample time series
+                file_deformation = self.config_data.file_deformation
+                file_reference = self.time_data.file_series[0]
+                data_feature_sampled[hemi] = sampler.sample_timeseries(
+                    file_deformation, file_reference
+                )
+
+            for hemi in ["lh", "rh"]:
+                label = self.surf_data.load_label_intersection(hemi)
+                data_feature_sampled[hemi] = [
+                    data_feature_sampled[hemi][x][label, :]
+                    for x in range(len(data_feature_sampled[hemi]))
+                ]
+
+            mvpa = ExternalFeatureMVPA.from_data(
+                data_sampled,
+                data_feature_sampled,
+                events,
+                nmax=self.config_model.nmax,
+                remove_nan=True,
             )
 
             # model preparation and fitting
