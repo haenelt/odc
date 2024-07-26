@@ -7,7 +7,8 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
-from fmri_decoder.data import DataConfig, ModelConfig, SurfaceData, TimeseriesData
+from fmri_decoder.data import (DataConfig, ModelConfig, SurfaceData,
+                               TimeseriesData)
 from fmri_decoder.model import ExternalFeatureMVPA
 from fmri_decoder.preprocessing import TimeseriesPreproc, TimeseriesSampling
 from sklearn.feature_selection import f_classif
@@ -325,10 +326,10 @@ class RunMVPA:
 
             mvpa = ExternalFeatureMVPA.from_data(
                 data_sampled,
-                data_feature_sampled,
                 events,
                 nmax=self.config_model.nmax,
                 remove_nan=True,
+                data_feature=data_feature_sampled,
             )
 
             # model preparation and fitting
