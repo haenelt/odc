@@ -1,20 +1,18 @@
 # -*- coding: utf-8 -*-
-"""Some reprocessing for reviewer."""
+"""Run decoding analysis with feature selected from time series averaged across cortical
+depth."""
 
 import functools
 import re
 from pathlib import Path
 
-import numpy as np
-import pandas as pd
 from fmri_decoder.data import DataConfig, ModelConfig, SurfaceData, TimeseriesData
 from fmri_decoder.model import ExternalFeatureMVPA
 from fmri_decoder.preprocessing import TimeseriesPreproc, TimeseriesSampling
-from sklearn.feature_selection import f_classif
 
 from .config import DIR_BASE, N_LAYER, N_RUN, SESSION
 
-__all__ = ["Data", "FeatureSelect", "RunMVPA"]
+__all__ = ["Data", "RunMVPA"]
 
 
 class Data:
@@ -166,66 +164,14 @@ class Data:
         return file_
 
 
-class FeatureSelect:
-    """Select features based on an already sampled data set."""
-
-    def __init__(self, subj, sess, day, area):
-        self.subj = subj
-        self.sess = sess
-        self.day = day
-        self.area = area
-        self.data = Data(self.subj, self.sess, self.day, self.area)
-        self.label, self.hemi = self.get_label
-        self.label_sorted, self.hemi_sorted = zip(
-            *[self.sort_features(i) for i in range(N_LAYER)]
-        )
-
-    @property
-    @functools.lru_cache()
-    def get_label(self):
-        """Get label and hemisphere."""
-        surf_data = SurfaceData(self.data.surfaces, None, self.data.labels)
-
-        label_left = surf_data.load_label_intersection("lh")
-        label_right = surf_data.load_label_intersection("rh")
-
-        hemi = np.zeros(len(label_left) + len(label_right))
-        hemi[len(label_left) :] = 1
-        label = np.append(label_left, label_right)
-
-        return label, hemi
-
-    def sort_features(self, layer):
-        """Sort label and hemi array based on features."""
-        dtf = pd.read_parquet(self.data.get_sample_data(layer))
-
-        # choose subset of features
-        features = dtf.columns[2:]
-
-        X = np.array(dtf.loc[:, features])
-        y = np.array(dtf.loc[:, "label"])
-
-        f_statistic = f_classif(X, y)[0]
-        index = np.arange(len(features))
-        index_sorted = np.array(
-            [x for _, x in sorted(zip(f_statistic, index), reverse=True)]
-        )
-
-        label_sorted = self.label[index_sorted]
-        hemi_sorted = self.hemi[index_sorted]
-
-        return label_sorted, hemi_sorted
-
-
 class RunMVPA:
     """Decoding analysis with shared features across cortical depth."""
 
-    def __init__(self, dir_out, subj, seq, day, area, feature_layer=5):
+    def __init__(self, dir_out, subj, seq, day, area):
         self.subj = subj
         self.seq = seq
         self.day = day
         self.area = area  # v1, v2, v3, v2a, v2b, v3a or v3b
-        self.feature_layer = feature_layer  # layer for feature selection
 
         # make output directory
         self.dir_out = Path(dir_out)
@@ -261,18 +207,6 @@ class RunMVPA:
 
     @property
     @functools.lru_cache()
-    def feature_selection(self):
-        features = FeatureSelect(self.subj, self.seq, self.day, self.area)
-        _features_selected = {
-            "hemi": features.hemi_sorted[self.feature_layer][: self.config_model.nmax],
-            "label": features.label_sorted[self.feature_layer][
-                : self.config_model.nmax
-            ],
-        }
-        return _features_selected
-
-    @property
-    @functools.lru_cache()
     def preprocessing(self):
         # timeseries preprocessing
         preproc = TimeseriesPreproc.from_dict(self.config)
@@ -289,7 +223,7 @@ class RunMVPA:
         data_feature_sampled = {}
         for i in range(n_surf):
             for hemi in ["lh", "rh"]:
-                vtx, fac = self.surf_data.load_layer(hemi, self.feature_layer)
+                vtx, fac = self.surf_data.load_layer(hemi, i)
                 sampler = TimeseriesSampling(vtx, fac, data_vol)
                 # sample time series
                 file_deformation = self.config_data.file_deformation
@@ -375,18 +309,10 @@ if __name__ == "__main__":
         type=str,
         help="Cortical area from which features are selected.",
     )
-    parser.add_argument(
-        "--flayer",
-        dest="feature_layer",
-        default=5,
-        type=int,
-        help="Layer from which features are selected.",
-    )
     args = parser.parse_args()
 
     # check arguments
     print(f"AREA: {args.area}")
-    print(f"FEATURE LAYER: {args.feature_layer}")
 
     for seq in ["GE_EPI", "SE_EPI", "VASO"]:
         for day in range(2):
@@ -397,5 +323,5 @@ if __name__ == "__main__":
                 / Data(args.subj, seq, day, args.area).sess
                 / f"{args.area}_bandpass_none"
             )
-            mvpa = RunMVPA(dir_out, args.subj, seq, day, args.area, args.feature_layer)
+            mvpa = RunMVPA(dir_out, args.subj, seq, day, args.area)
             mvpa.decoding()
