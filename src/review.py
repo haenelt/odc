@@ -8,7 +8,7 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 from fmri_decoder.data import DataConfig, ModelConfig, SurfaceData, TimeseriesData
-from fmri_decoder.model import ExternalFeatureMVPA, MVPA
+from fmri_decoder.model import ExternalFeatureMVPA
 from fmri_decoder.preprocessing import TimeseriesPreproc, TimeseriesSampling
 from sklearn.feature_selection import f_classif
 
@@ -277,7 +277,7 @@ class RunMVPA:
         # timeseries preprocessing
         preproc = TimeseriesPreproc.from_dict(self.config)
         # detrend time series
-        # _ = preproc.detrend_timeseries(self.config_data.tr, self.config_data.cutoff_sec)
+        _ = preproc.detrend_timeseries(self.config_data.tr, self.config_data.cutoff_sec)
         # crop time series
         data_vol, events = preproc.crop_data(self.config_data.n_skip)
         return data_vol, events
@@ -323,9 +323,6 @@ class RunMVPA:
                     for x in range(len(data_feature_sampled[hemi]))
                 ]
 
-            # mvpa = MVPA.from_data(
-            #    data_sampled, events, nmax=self.config_model.nmax, remove_nan=True
-            # )
             mvpa = ExternalFeatureMVPA.from_data(
                 data_sampled,
                 data_feature_sampled,
