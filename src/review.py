@@ -7,8 +7,7 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
-from fmri_decoder.data import (DataConfig, ModelConfig, SurfaceData,
-                               TimeseriesData)
+from fmri_decoder.data import DataConfig, ModelConfig, SurfaceData, TimeseriesData
 from fmri_decoder.model import ExternalFeatureMVPA
 from fmri_decoder.preprocessing import TimeseriesPreproc, TimeseriesSampling
 from sklearn.feature_selection import f_classif
@@ -308,7 +307,7 @@ class RunMVPA:
 
             data_feature_sampled = {}
             for hemi in ["lh", "rh"]:
-                vtx, fac = self.surf_data.load_layer(hemi, i)
+                vtx, fac = self.surf_data.load_layer(hemi, self.feature_layer)
                 sampler = TimeseriesSampling(vtx, fac, data_vol)
                 # sample time series
                 file_deformation = self.config_data.file_deformation
