@@ -373,7 +373,8 @@ if __name__ == "__main__":
     print(f"AREA: {args.area}")
     print(f"FEATURE LAYER: {args.feature_layer}")
 
-    for seq in ["GE_EPI", "SE_EPI", "VASO"]:
+    # for seq in ["GE_EPI", "SE_EPI", "VASO"]:
+    for seq in ["SE_EPI"]:
         for day in range(2):
             print(f"Running: subj -> {args.subj}, sequence -> {seq}, day -> {day}")
             dir_out = (
