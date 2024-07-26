@@ -284,6 +284,39 @@ class RunMVPA:
 
     def decoding(self):
         data_vol, events = self.preprocessing
+        # get features from time series averaged across cortical depth
+        n_surf = len(self.surf_data.file_layer["lh"])
+        data_feature_sampled = {}
+        for i in range(n_surf):
+            for hemi in ["lh", "rh"]:
+                vtx, fac = self.surf_data.load_layer(hemi, self.feature_layer)
+                sampler = TimeseriesSampling(vtx, fac, data_vol)
+                # sample time series
+                file_deformation = self.config_data.file_deformation
+                file_reference = self.time_data.file_series[0]
+                if i == 0:
+                    data_feature_sampled[hemi] = sampler.sample_timeseries(
+                        file_deformation, file_reference
+                    )
+                else:
+                    _tmp = sampler.sample_timeseries(file_deformation, file_reference)
+                    data_feature_sampled[hemi] = [
+                        a + b for a, b in zip(data_feature_sampled[hemi], _tmp)
+                    ]
+
+        for hemi in ["lh", "rh"]:
+            data_feature_sampled[hemi] = [
+                data_feature_sampled[hemi][x] / n_surf
+                for x in range(len(data_feature_sampled[hemi]))
+            ]
+
+        for hemi in ["lh", "rh"]:
+            label = self.surf_data.load_label_intersection(hemi)
+            data_feature_sampled[hemi] = [
+                data_feature_sampled[hemi][x][label, :]
+                for x in range(len(data_feature_sampled[hemi]))
+            ]
+
         # iterate over surfaces (layers)
         n_surf = len(self.surf_data.file_layer["lh"])
         for i in range(n_surf):
@@ -303,24 +336,6 @@ class RunMVPA:
                 data_sampled[hemi] = [
                     data_sampled[hemi][x][label, :]
                     for x in range(len(data_sampled[hemi]))
-                ]
-
-            data_feature_sampled = {}
-            for hemi in ["lh", "rh"]:
-                vtx, fac = self.surf_data.load_layer(hemi, self.feature_layer)
-                sampler = TimeseriesSampling(vtx, fac, data_vol)
-                # sample time series
-                file_deformation = self.config_data.file_deformation
-                file_reference = self.time_data.file_series[0]
-                data_feature_sampled[hemi] = sampler.sample_timeseries(
-                    file_deformation, file_reference
-                )
-
-            for hemi in ["lh", "rh"]:
-                label = self.surf_data.load_label_intersection(hemi)
-                data_feature_sampled[hemi] = [
-                    data_feature_sampled[hemi][x][label, :]
-                    for x in range(len(data_feature_sampled[hemi]))
                 ]
 
             mvpa = ExternalFeatureMVPA.from_data(
