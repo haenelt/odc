@@ -4,12 +4,9 @@
 from pathlib import Path
 
 import numpy as np
-from fmri_tools.io.surf import write_label, write_mgh
+from fmri_tools.io.surf import write_label
 from nibabel.freesurfer.io import read_geometry
 from tqdm import tqdm
-
-from .config import SESSION
-from .data import Data
 
 __all__ = ["get_composed_label"]
 
