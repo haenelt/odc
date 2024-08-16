@@ -21,6 +21,7 @@ ipykernel = "^6.20.1"
 palettable = "^3.3.0"
 statsmodels = "^0.13.5"
 tqdm = "^4.65.0"
+diptest = "^0.8.0"
 
 [build-system]
 requires = ["poetry-core"]
