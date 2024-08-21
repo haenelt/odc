@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """Run decoding analysis with feature selected from time series averaged across cortical
-depth."""
+depth. This was one of the main reviewer comments."""
 
 import functools
 import re
@@ -167,15 +167,17 @@ class Data:
 class RunMVPA:
     """Decoding analysis with shared features across cortical depth."""
 
-    def __init__(self, dir_out, subj, seq, day, area):
+    def __init__(self, dir_out, subj, seq, day, area, verbose):
         self.subj = subj
         self.seq = seq
         self.day = day
         self.area = area  # v1, v2, v3, v2a, v2b, v3a or v3b
+        self.verbose = verbose  # save samples to disk
 
         # make output directory
         self.dir_out = Path(dir_out)
         self.dir_out.mkdir(parents=True, exist_ok=True)
+        self.dir_sample = self.dir_out / "sample"
 
         # load data
         self.time_data = TimeseriesData.from_dict(self.config)
@@ -280,6 +282,10 @@ class RunMVPA:
                 data_feature=data_feature_sampled,
             )
 
+            if self.verbose is True:
+                self.dir_sample.mkdir(parents=True, exist_ok=True)
+                mvpa.save_dataframe(self.dir_sample / f"sample_data_{i}.parquet")
+
             # model preparation and fitting
             # scaling
             if self.config_model.feature_scaling:
@@ -309,10 +315,18 @@ if __name__ == "__main__":
         type=str,
         help="Cortical area from which features are selected.",
     )
+    parser.add_argument(
+        "--save_samples",
+        dest="save_samples",
+        action="store_true",
+        help="Save data samples to disk (default: %(default)s).",
+        default=False,
+    )
     args = parser.parse_args()
 
     # check arguments
     print(f"AREA: {args.area}")
+    print(f"Save samples: {args.save_samples}")
 
     for seq in ["GE_EPI", "SE_EPI", "VASO"]:
         for day in range(2):
@@ -323,5 +337,5 @@ if __name__ == "__main__":
                 / Data(args.subj, seq, day, args.area).sess
                 / f"{args.area}_bandpass_none"
             )
-            mvpa = RunMVPA(dir_out, args.subj, seq, day, args.area)
+            mvpa = RunMVPA(dir_out, args.subj, seq, day, args.area, args.save_samples)
             mvpa.decoding()
