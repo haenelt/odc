@@ -309,6 +309,13 @@ if __name__ == "__main__":
     parser.add_argument("--out", dest="out", type=str, help="Output base directory.")
     parser.add_argument("--subj", dest="subj", type=str, help="Subject name.")
     parser.add_argument(
+        "--sess",
+        dest="sess",
+        type=str,
+        help="Session name (GE_EPI, SE_EPI, VASO, VASO_uncorrected).",
+    )
+    parser.add_argument("--day", dest="day", type=int, help="Session day (0 or 1).")
+    parser.add_argument(
         "--area",
         dest="area",
         default="v1",
@@ -325,17 +332,18 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     # check arguments
+    print("Running...")
+    print(f"SUBJ: {args.subj}")
+    print(f"SESSION: {args.sess}")
+    print(f"DAY: {args.day}")
     print(f"AREA: {args.area}")
     print(f"Save samples: {args.save_samples}")
 
-    for seq in ["GE_EPI", "SE_EPI", "VASO"]:
-        for day in range(2):
-            print(f"Running: subj -> {args.subj}, sequence -> {seq}, day -> {day}")
-            dir_out = (
-                Path(args.out)
-                / args.subj
-                / Data(args.subj, seq, day, args.area).sess
-                / f"{args.area}_bandpass_none"
-            )
-            mvpa = RunMVPA(dir_out, args.subj, seq, day, args.area, args.save_samples)
-            mvpa.decoding()
+    dir_out = (
+        Path(args.out)
+        / args.subj
+        / Data(args.subj, args.sess, args.day, args.area).sess
+        / f"{args.area}_bandpass_none"
+    )
+    mvpa = RunMVPA(dir_out, args.subj, args.sess, args.day, args.area, args.save_samples)
+    mvpa.decoding()
