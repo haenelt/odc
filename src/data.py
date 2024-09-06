@@ -1,14 +1,15 @@
 # -*- coding: utf-8 -*-
 """Filepaths to data."""
 
+import re
 from dataclasses import dataclass
 from pathlib import Path
 
 from fmri_tools.io.surf import read_mgh
 
-from .config import N_LAYER
+from .config import DIR_BASE, N_LAYER, N_RUN, SESSION
 
-__all__ = ["Data"]
+__all__ = ["Data", "DataNew"]
 
 
 @dataclass
@@ -35,15 +36,15 @@ class Data:
 
     @property
     def file_label(self):
-        """Load label files."""
+        """Load label files. Changed to load benson labels files."""
         file_ = {}
         file_["lh"] = [
             str(self.DIR_BASE / self.subj / "anatomy" / "label" / "lh.fov.label"),
-            str(self.DIR_BASE / self.subj / "anatomy" / "label" / "lh.v1.label"),
+            str(self.DIR_BASE / self.subj / "anatomy" / "label_benson" / "lh.v1.label"),
         ]
         file_["rh"] = [
             str(self.DIR_BASE / self.subj / "anatomy" / "label" / "rh.fov.label"),
-            str(self.DIR_BASE / self.subj / "anatomy" / "label" / "rh.v1.label"),
+            str(self.DIR_BASE / self.subj / "anatomy" / "label_benson" / "rh.v1.label"),
         ]
         return file_
 
@@ -150,3 +151,151 @@ class Data:
             / f"{hemi}.nssw_layer_{layer}.mgh"
         )
         return read_mgh(file)[0]
+
+
+class DataNew:
+    """File paths to (reprocessed) data for review. More specific, label files now point
+    to the labels generated with the Benson method and sample data point to the version
+    v3.0."""
+
+    def __init__(self, subj, sequence, day, area):
+        self.subj = subj
+        self.sess = f"{sequence}{SESSION[self.subj][sequence][day]}"
+        self.day = day
+        self.area = area
+
+    @property
+    def surfaces(self):
+        """File names of surface geometries."""
+        file_ = {}
+        for hemi in ["lh", "rh"]:
+            file_[hemi] = [
+                str(
+                    Path(DIR_BASE)
+                    / self.subj
+                    / "anatomy"
+                    / "layer"
+                    / f"{hemi}.layer_{i}"
+                )
+                for i in range(N_LAYER)
+            ]
+        return file_
+
+    @property
+    def labels(self):
+        """File names of labels."""
+        file_ = {}
+        for hemi in ["lh", "rh"]:
+            file_[hemi] = [
+                str(
+                    Path(DIR_BASE)
+                    / self.subj
+                    / "anatomy"
+                    / "label_benson"
+                    / f"{hemi}.{self.area}.label"
+                ),
+                str(
+                    Path(DIR_BASE)
+                    / self.subj
+                    / "anatomy"
+                    / "label"
+                    / f"{hemi}.fov.label"
+                ),
+            ]
+        return file_
+
+    def get_sample_data(self, layer):
+        """Load sample data from MVPA analysis."""
+        file = (
+            Path(DIR_BASE)
+            / "paper"
+            / "v3.0"
+            / self.subj
+            / self.sess
+            / f"{self.area}_bandpass_none"
+            / "sample"
+            / f"sample_data_{layer}.parquet"
+        )
+        return file
+
+    @property
+    def timeseries(self):
+        """File names of fmri time series."""
+        if "VASO" in self.sess and "uncorrected" in self.sess:
+            sess_ = re.sub("_uncorrected", "", self.sess)
+            file_ = [
+                str(
+                    Path(DIR_BASE)
+                    / self.subj
+                    / "odc"
+                    / sess_
+                    / f"Run_{i + 1}"
+                    / "ubold_upsampled.nii"
+                )
+                for i in range(N_RUN)
+            ]
+        elif "VASO" in self.sess:
+            file_ = [
+                str(
+                    Path(DIR_BASE)
+                    / self.subj
+                    / "odc"
+                    / self.sess
+                    / f"Run_{i + 1}"
+                    / "uvaso_upsampled_corrected.nii"
+                )
+                for i in range(N_RUN)
+            ]
+        else:
+            file_ = [
+                str(
+                    Path(DIR_BASE)
+                    / self.subj
+                    / "odc"
+                    / self.sess
+                    / f"Run_{i + 1}"
+                    / "udata.nii"
+                )
+                for i in range(N_RUN)
+            ]
+        return file_
+
+    @property
+    def events(self):
+        """File names of condition files."""
+        sess_ = (
+            re.sub("_uncorrected", "", self.sess)
+            if "_uncorrected" in self.sess
+            else self.sess
+        )
+        file_ = [
+            str(
+                Path(DIR_BASE)
+                / self.subj
+                / "odc"
+                / sess_
+                / f"Run_{i+1}"
+                / "logfiles"
+                / f"{self.subj}_{sess_}_Run{i + 1}_odc_Cond.mat"
+            )
+            for i in range(N_RUN)
+        ]
+        return file_
+
+    @property
+    def deformation(self):
+        """File name of coordinate mapping."""
+        sess_ = (
+            re.sub("_uncorrected", "", self.sess)
+            if "_uncorrected" in self.sess
+            else self.sess
+        )
+        file_ = str(
+            Path(DIR_BASE)
+            / self.subj
+            / "deformation"
+            / "odc"
+            / sess_
+            / "source2target.nii.gz"
+        )
+        return file_
