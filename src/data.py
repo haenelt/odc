@@ -218,6 +218,21 @@ class DataNew:
         )
         return file
 
+    def get_sample_data_v2p0(self, layer):
+        """Load sample data from MVPA analyssi (v2.0)."""
+        file = (
+            Path(DIR_BASE) 
+            / "paper" 
+            / "v2.0" 
+            / "decoding" 
+            / self.subj 
+            / self.sess 
+            / f"{self.area}_bandpass_none" 
+            / "sample" 
+            / f"sample_data_{layer}.parquet"
+        )
+        return file
+
     @property
     def timeseries(self):
         """File names of fmri time series."""
