@@ -1,6 +1,6 @@
-- [ ] create tags
+- [x] create tags
+- [x] merge
 - [ ] src/data.py
 - [ ] src/mvpa_review.py: rename, dependencies, Data
 - [ ] notebooks to scripts
-- [ ] merge
 - [ ] make figures

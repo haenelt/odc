@@ -345,5 +345,7 @@ if __name__ == "__main__":
         / Data(args.subj, args.sess, args.day, args.area).sess
         / f"{args.area}_bandpass_none"
     )
-    mvpa = RunMVPA(dir_out, args.subj, args.sess, args.day, args.area, args.save_samples)
+    mvpa = RunMVPA(
+        dir_out, args.subj, args.sess, args.day, args.area, args.save_samples
+    )
     mvpa.decoding()
