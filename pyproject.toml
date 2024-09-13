@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "odc"
-version = "0.1.0"
+version = "0.3.0"
 description = "Some analysis script for the ODC project"
 authors = ["Daniel Haenelt <daniel.haenelt@gmail.com>"]
 license = "GPLv3"
