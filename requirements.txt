@@ -9,3 +9,4 @@ pymc
 arviz
 graphviz
 diptest
+tqdm
