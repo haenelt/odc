@@ -9,10 +9,14 @@ from fmri_decoder.model import MVPA
 from joblib import Parallel, delayed
 from tqdm import tqdm
 
-from src.config import DIR_BASE, N_LAYER, NUM_CORES
+from src.config import DIR_BASE, N_LAYER
 from src.data import Data
 
 __all__ = ["RunNFeatures"]
+
+
+# Constants
+NUM_CORES = 128
 
 
 class RunNFeatures:
