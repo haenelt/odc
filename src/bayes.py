@@ -192,15 +192,15 @@ class LinearModel:
         plt.show()
 
     @classmethod
-    def from_data(cls, sess):
+    def from_data(cls, sess, area, version):
         """Read my data from disk. Data from both sessions are averaged."""
         x = {"0": [], "1": []}
         y = {"0": [], "1": []}
         group = {"0": [], "1": []}
         for i, subj in enumerate(SUBJECTS):
             for day in [0, 1]:
-                path = Path(DIR_DATA) / subj / f"{sess}{SESSION[subj][sess][day]}"
-                file = path / "bandpass_none" / "accuracy.csv"
+                path = Path(DIR_DATA) / version / "decoding" / subj / f"{sess}{SESSION[subj][sess][day]}"
+                file = path / f"{area}_bandpass_none" / "accuracy.csv"
                 data = np.genfromtxt(file, delimiter=",")
                 data = np.mean(data, axis=1)
 

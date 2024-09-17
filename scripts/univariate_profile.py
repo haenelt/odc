@@ -92,6 +92,7 @@ def _main(dir_out, sess, area, nmax, version):
     file_out = Path(dir_out) / f"psc_{sess}_session_average.svg" if nmax else Path(dir_out) / f"psc_{sess}_all_session_average.svg" 
     fig.savefig(file_out, dpi=300, bbox_inches="tight", transparent=True, format="svg")
 
+
 if __name__ == "__main__":
     import argparse
 

@@ -18,8 +18,8 @@ plt.style.use("src/default.mplstyle")
 
 
 def _main(dir_out, sess, part, sigma, version):
-    z1 = get_nprofile(version, sess, 0)
-    z2 = get_nprofile(version, sess, 1)
+    z1 = get_nprofile(sess, 0, version)
+    z2 = get_nprofile(sess, 1, version)
     z3 = np.vstack((z1, z2))
     if part == 0:
         data = np.mean(z1, axis=0)

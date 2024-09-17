@@ -22,7 +22,7 @@ __all__ = [
 ]
 
 
-def get_profile(version, area, sess, day):
+def get_profile(area, sess, day, version):
     """Get accuracy across cortical depth."""
     y = np.zeros((N_LAYER, len(SUBJECTS)))
     for i, subj in enumerate(SUBJECTS):
@@ -32,7 +32,7 @@ def get_profile(version, area, sess, day):
             / version
             / "decoding"
             / subj
-            / f"{sess}{SESSION[subj][sess][day]}",
+            / f"{sess}{SESSION[subj][sess][day]}"
         )
         if version == "v1.0":
             _file = _path / "bandpass_none" / "accuracy.csv"
@@ -44,7 +44,7 @@ def get_profile(version, area, sess, day):
     return y
 
 
-def get_nprofile(version, sess, day):
+def get_nprofile(sess, day, version):
     """Get accuracy across cortical depth and across number of features."""
     data = []
     for subj in SUBJECTS:
@@ -68,7 +68,7 @@ def get_univariate_profile(sess, day, area, nmax, version):
 
     y = np.zeros((N_LAYER, len(SUBJECTS)))
     for i, subj in enumerate(SUBJECTS):
-        label, hemi = get_label(subj)
+        label, hemi = get_label(subj, area)
         _data = Data(subj, sess, day, area)
 
         if version == "v3.0":
@@ -95,9 +95,9 @@ def get_univariate_profile(sess, day, area, nmax, version):
     return y
 
 
-def get_label(subj):
+def get_label(subj, area):
     """Get label from intersection of V1 and FOV."""
-    data = Data(subj, None, None, "v1")
+    data = Data(subj, None, None, area)
     surf_data = SurfaceData(data.surfaces, None, data.labels)
 
     label_left = surf_data.load_label_intersection("lh")

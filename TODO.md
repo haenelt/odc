@@ -3,7 +3,7 @@
 - [x] src/data.py
 - [x] src/mvpa_review.py: rename, dependencies, Data
 - [x] scripts (univarite_profile)
-- [ ] scripts_marianna
+- [x] scripts_marianna
 - [ ] scripts_review
 - [ ] make n_features
 - [ ] make figures

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Number of features."""
+"""Test-retest reliability from V1 data."""
 
 import os
 import random
@@ -22,7 +22,7 @@ plt.style.use("src/default.mplstyle")
 def _main(dir_out, subj, sess, frac, n_shuffle):
     data_files1 = Data(subj, sess, 0, None)
     data_files2 = Data(subj, sess, 1, None)
-    label, hemi = get_label(subj)
+    label, hemi = get_label(subj, "v1")
     data1 = np.zeros_like(hemi)
     data2 = np.zeros_like(hemi)
     data1[hemi == 0] = data_files1.get_contrast("lh", 5)[label[hemi == 0]]

@@ -23,8 +23,8 @@ def _main(dir_out, sess, part, area1, area2, version):
     p_adj = []
     areas = [area1, area2]
     for area in areas:
-        y1 = get_profile(version, area, sess, 0)
-        y2 = get_profile(version, area, sess, 1)
+        y1 = get_profile(area, sess, 0, version)
+        y2 = get_profile(area, sess, 1, version)
         y3 = np.append(y1, y2, axis=1)
         if part == 0:
             data.append(np.mean(y1, axis=1))

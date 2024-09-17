@@ -19,8 +19,8 @@ plt.style.use("src/default.mplstyle")
 
 def _main(dir_out, sess, area, version):
     x = np.linspace(0, 1, N_LAYER)
-    y1 = get_profile(version, area, sess, 0)
-    y2 = get_profile(version, area, sess, 1)
+    y1 = get_profile(area, sess, 0, version)
+    y2 = get_profile(area, sess, 1, version)
     y3 = np.append(y1, y2, axis=1)
 
     ci_low = []
