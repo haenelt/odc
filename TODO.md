@@ -2,7 +2,7 @@
 - [x] merge
 - [x] src/data.py
 - [x] src/mvpa_review.py: rename, dependencies, Data
-- [ ] scripts (univarite_profile)
+- [x] scripts (univarite_profile)
 - [ ] scripts_marianna
 - [ ] scripts_review
 - [ ] make n_features
