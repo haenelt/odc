@@ -24,8 +24,6 @@ class Data:
     @property
     def sess(self):
         """Session name."""
-        if "_uncorrected" in self.sequence:
-            return f"{self.sequence[: 4]}{SESSION[self.subj][self.sequence][self.day]}_uncorrected"
         return f"{self.sequence}{SESSION[self.subj][self.sequence][self.day]}"
 
     @property
