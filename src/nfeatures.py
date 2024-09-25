@@ -34,7 +34,7 @@ class RunNFeatures:
         self.data = Data(subj, seq, day, "v1")
         self.session = self.data.sess
 
-        dir_out = (
+        self.dir_out = (
             Path(DIR_BASE)
             / "paper"
             / self.version
@@ -42,7 +42,7 @@ class RunNFeatures:
             / self.subj
             / self.session
         )
-        dir_out.mkdir(parents=True, exist_ok=True)
+        self.dir_out.mkdir(parents=True, exist_ok=True)
 
     def _compute(self, i):
         mvpa = RunMVPA(self.subj, self.sess, self.day, self.area, None, False)
@@ -60,7 +60,7 @@ class RunNFeatures:
 
     def save(self):
         # save as csv
-        np.savetxt(dir_out / "accuracy.csv", self.run(), delimiter=",")
+        np.savetxt(self.dir_out / "accuracy.csv", self.run(), delimiter=",")
 
 
 if __name__ == "__main__":
