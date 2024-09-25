@@ -18,7 +18,7 @@ __all__ = ["RunNFeatures"]
 
 
 # Constants
-NUM_CORES = 128
+NUM_CORES = 32
 os.environ["OMP_NUM_THREADS"] = "1"  # limit numpy to single threads
 
 
@@ -29,6 +29,7 @@ class RunNFeatures:
         self.subj = subj
         self.seq = seq
         self.day = day
+        self.area = "v1"
         self.nmax = nmax
         self.version = version
         self.data = Data(subj, seq, day, "v1")
@@ -45,8 +46,8 @@ class RunNFeatures:
         self.dir_out.mkdir(parents=True, exist_ok=True)
 
     def _compute(self, i):
-        mvpa = RunMVPA(self.subj, self.sess, self.day, self.area, None, False)
-        mvpa.condig["nmax"] = i
+        mvpa = RunMVPA(self.subj, self.seq, self.day, self.area, None, False)
+        mvpa.config["nmax"] = i
         score = mvpa.decoding()
         # garbage collection
         gc.collect()
