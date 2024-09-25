@@ -19,7 +19,7 @@ __all__ = ["RunNFeatures"]
 
 # Constants
 NUM_CORES = 128
-os.environ["OMP_NUM_THREADS"] = 1  # limit numpy to single threads
+os.environ["OMP_NUM_THREADS"] = "1"  # limit numpy to single threads
 
 
 class RunNFeatures:
