@@ -2,13 +2,15 @@
 """Run number of features: python run_features.py --subj <subject name> 
 --seq <sequence name> --day <day>"""
 
+import os
 from pathlib import Path
+import gc
 
 import numpy as np
-from fmri_decoder.model import MVPA
 from joblib import Parallel, delayed
 from tqdm import tqdm
 
+from src.mvpa import RunMVPA
 from src.config import DIR_BASE, N_LAYER
 from src.data import Data
 
@@ -17,6 +19,7 @@ __all__ = ["RunNFeatures"]
 
 # Constants
 NUM_CORES = 128
+os.environ["OMP_NUM_THREADS"] = 1  # limit numpy to single threads
 
 
 class RunNFeatures:
@@ -31,24 +34,6 @@ class RunNFeatures:
         self.data = Data(subj, seq, day, "v1")
         self.session = self.data.sess
 
-    def _compute(self, i):
-        score = np.zeros(N_LAYER)
-        for layer in range(N_LAYER):
-            file_sample = self.data.get_sample_data(layer, self.version)
-            mvpa = MVPA.from_file(file_sample, nmax=i)
-            mvpa.scale_features("standard")
-            res = mvpa.evaluate
-            score[layer] += np.mean(res.accuracy)
-        return score
-
-    def run(self):
-        _res = Parallel(n_jobs=NUM_CORES)(
-            delayed(self._compute)(_i) for _i in tqdm(range(1, self.nmax + 1))
-        )
-        return _res
-
-    def save(self):
-        # save as csv
         dir_out = (
             Path(DIR_BASE)
             / "paper"
@@ -58,6 +43,23 @@ class RunNFeatures:
             / self.session
         )
         dir_out.mkdir(parents=True, exist_ok=True)
+
+    def _compute(self, i):
+        mvpa = RunMVPA(self.subj, self.sess, self.day, self.area, None, False)
+        mvpa.condig["nmax"] = i
+        score = mvpa.decoding()
+        # garbage collection
+        gc.collect()
+        return score
+
+    def run(self):
+        _res = Parallel(n_jobs=NUM_CORES, backend="loky")(
+            delayed(self._compute)(_i) for _i in tqdm(range(1, self.nmax + 1))
+        )
+        return _res
+
+    def save(self):
+        # save as csv
         np.savetxt(dir_out / "accuracy.csv", self.run(), delimiter=",")
 
 

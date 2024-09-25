@@ -17,7 +17,7 @@ __all__ = ["RunMVPA"]
 class RunMVPA:
     """Decoding analysis with shared features across cortical depth."""
 
-    def __init__(self, dir_out, subj, seq, day, area, verbose):
+    def __init__(self, subj, seq, day, area, dir_out, verbose):
         self.subj = subj
         self.seq = seq
         self.day = day
@@ -25,9 +25,14 @@ class RunMVPA:
         self.verbose = verbose  # save samples to disk
 
         # make output directory
-        self.dir_out = Path(dir_out)
-        self.dir_out.mkdir(parents=True, exist_ok=True)
-        self.dir_sample = self.dir_out / "sample"
+        self.dir_out = None
+        self.dir_sample = None
+
+        if dir_out is not None:
+            self.dir_out = Path(dir_out)
+            self.dir_out.mkdir(parents=True, exist_ok=True)
+        if verbose is True and dir_out:
+            self.dir_sample = self.dir_out / "sample"
 
         # load data
         self.time_data = TimeseriesData.from_dict(self.config)
@@ -68,7 +73,7 @@ class RunMVPA:
         data_vol, events = preproc.crop_data(self.config_data.n_skip)
         return data_vol, events
 
-    def decoding(self):
+    def decoding(self, save=False):
         data_vol, events = self.preprocessing
         # get features from time series averaged across cortical depth
         n_surf = len(self.surf_data.file_layer["lh"])
@@ -105,6 +110,7 @@ class RunMVPA:
 
         # iterate over surfaces (layers)
         n_surf = len(self.surf_data.file_layer["lh"])
+        score = np.zeros(N_LAYER)
         for i in range(n_surf):
             data_sampled = {}
             for hemi in ["lh", "rh"]:
@@ -132,7 +138,7 @@ class RunMVPA:
                 data_feature=data_feature_sampled,
             )
 
-            if self.verbose is True:
+            if self.verbose is True and self.dir_out is not None:
                 self.dir_sample.mkdir(parents=True, exist_ok=True)
                 mvpa.save_dataframe(self.dir_sample / f"sample_data_{i}.parquet")
 
@@ -142,13 +148,23 @@ class RunMVPA:
                 mvpa.scale_features(self.config_model.feature_scaling)
             if self.config_model.sample_scaling:
                 mvpa.scale_samples(self.config_model.sample_scaling)
-            _ = mvpa.evaluate
+            res = mvpa.evaluate
 
-            # save results
-            mvpa.save_results(self.dir_out / "accuracy.csv", "accuracy")
-            mvpa.save_results(self.dir_out / "sensitivity.csv", "sensitivity")
-            mvpa.save_results(self.dir_out / "specificity.csv", "specificity")
-            mvpa.save_results(self.dir_out / "f1.csv", "f1")
+            # get scores
+            score[i] += np.mean(res.accuracy)
+
+            # save output
+            if self.dir_out is not None:
+                self.save()
+
+        return score
+
+    def save(self):
+        # save results
+        mvpa.save_results(self.dir_out / "accuracy.csv", "accuracy")
+        mvpa.save_results(self.dir_out / "sensitivity.csv", "sensitivity")
+        mvpa.save_results(self.dir_out / "specificity.csv", "specificity")
+        mvpa.save_results(self.dir_out / "f1.csv", "f1")
 
 
 if __name__ == "__main__":
@@ -197,6 +213,6 @@ if __name__ == "__main__":
         / f"{args.area}_bandpass_none"
     )
     mvpa = RunMVPA(
-        dir_out, args.subj, args.sess, args.day, args.area, args.save_samples
+        args.subj, args.sess, args.day, args.area, args.dir_out, args.save_samples
     )
-    mvpa.decoding()
+    _ = mvpa.decoding()
