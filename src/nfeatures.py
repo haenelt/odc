@@ -19,7 +19,6 @@ __all__ = ["RunNFeatures"]
 
 # Constants
 NUM_CORES = 32
-os.environ["OMP_NUM_THREADS"] = "1"  # limit numpy to single threads
 
 
 class RunNFeatures:
@@ -54,7 +53,7 @@ class RunNFeatures:
         return score
 
     def run(self):
-        _res = Parallel(n_jobs=NUM_CORES, backend="loky")(
+        _res = Parallel(n_jobs=NUM_CORES, mmap_mode=None)(
             delayed(self._compute)(_i) for _i in tqdm(range(1, self.nmax + 1))
         )
         return _res
