@@ -59,8 +59,9 @@ class RunNFeatures:
         return _res
 
     def save(self):
+        _scores = self.run()
         # save as csv
-        np.savetxt(self.dir_out / "accuracy.csv", self.run(), delimiter=",")
+        np.savetxt(self.dir_out / "accuracy.csv", _scores, delimiter=",")
 
 
 if __name__ == "__main__":

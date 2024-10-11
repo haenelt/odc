@@ -4,12 +4,14 @@ depth. This was one of the main reviewer comments."""
 
 import functools
 from pathlib import Path
+import numpy as np
 
 from fmri_decoder.data import DataConfig, ModelConfig, SurfaceData, TimeseriesData
 from fmri_decoder.model import ExternalFeatureMVPA
 from fmri_decoder.preprocessing import TimeseriesPreproc, TimeseriesSampling
 
 from src.data import Data
+from src.config import N_LAYER
 
 __all__ = ["RunMVPA"]
 
