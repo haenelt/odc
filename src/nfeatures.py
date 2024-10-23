@@ -4,10 +4,8 @@
 
 import os
 from pathlib import Path
-import gc
 
 import numpy as np
-from joblib import Parallel, delayed
 from tqdm import tqdm
 
 from src.mvpa import RunMVPA
@@ -15,10 +13,6 @@ from src.config import DIR_BASE, N_LAYER
 from src.data import Data
 
 __all__ = ["RunNFeatures"]
-
-
-# Constants
-NUM_CORES = 32
 
 
 class RunNFeatures:
@@ -48,20 +42,13 @@ class RunNFeatures:
         mvpa = RunMVPA(self.subj, self.seq, self.day, self.area, None, False)
         mvpa.config["nmax"] = i
         score = mvpa.decoding()
-        # garbage collection
-        gc.collect()
         return score
 
     def run(self):
-        _res = Parallel(n_jobs=NUM_CORES, mmap_mode=None)(
-            delayed(self._compute)(_i) for _i in tqdm(range(1, self.nmax + 1))
-        )
-        return _res
-
-    def save(self):
-        _scores = self.run()
-        # save as csv
-        np.savetxt(self.dir_out / "accuracy.csv", _scores, delimiter=",")
+        with open(self.dir_out / "accuracy.csv", "a") as f:
+            for i in tqdm(range(1, self.nmax + 1)):
+                _score = self._compute(i)
+                np.savetxt(f, _score, delimiter=",")
 
 
 if __name__ == "__main__":
@@ -95,6 +82,6 @@ if __name__ == "__main__":
     print(f"VERSION: {args.version}")
 
     nfeature = RunNFeatures(args.subj, args.sess, args.day, args.nmax, args.version)
-    nfeature.save()
+    nfeature.run()
 
     print("Done.")
