@@ -18,7 +18,7 @@ __all__ = ["RunNFeatures"]
 
 
 # Constants
-NUM_CORES = 64
+NUM_CORES = 32
 
 
 class RunNFeatures:
