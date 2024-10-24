@@ -6,7 +6,6 @@ import os
 from pathlib import Path
 
 import numpy as np
-from tqdm import tqdm
 
 from src.mvpa import RunMVPA
 from src.config import DIR_BASE, N_LAYER
@@ -18,12 +17,11 @@ __all__ = ["RunNFeatures"]
 class RunNFeatures:
     """Compute accuracies for various numbers of features."""
 
-    def __init__(self, subj, seq, day, nmax, version):
+    def __init__(self, subj, seq, day, version):
         self.subj = subj
         self.seq = seq
         self.day = day
         self.area = "v1"
-        self.nmax = nmax
         self.version = version
         self.data = Data(subj, seq, day, "v1")
         self.session = self.data.sess
@@ -38,17 +36,13 @@ class RunNFeatures:
         )
         self.dir_out.mkdir(parents=True, exist_ok=True)
 
-    def _compute(self, i):
+    def run(self, i_min, i_max):
         mvpa = RunMVPA(self.subj, self.seq, self.day, self.area, None, False)
-        mvpa.config["nmax"] = i
-        score = mvpa.decoding()
-        return score
-
-    def run(self):
-        with open(self.dir_out / "accuracy.csv", "a") as f:
-            for i in tqdm(range(1, self.nmax + 1)):
-                _score = self._compute(i)
-                np.savetxt(f, _score, delimiter=",")
+        with open(self.dir_out / f"accuracy_{i_min}_{i_max}.csv", "a") as f:
+            for i in range(i_min, i_max+1):
+                mvpa.config["nmax"] = i
+                score = mvpa.decoding()
+                f.write(",".join(map(str, score)) + "\n")
 
 
 if __name__ == "__main__":
@@ -66,7 +60,10 @@ if __name__ == "__main__":
     )
     parser.add_argument("--day", dest="day", type=int, help="Session day (0 or 1).")
     parser.add_argument(
-        "--nmax", dest="nmax", default=200, type=int, help="Number of features.",
+        "--nmin", dest="nmin", default=1, type=int, helper="Minimum feature number.",
+    )
+    parser.add_argument(
+        "--nmax", dest="nmax", default=200, type=int, help="Maximum feature number.",
     )
     parser.add_argument(
         "--version", dest="version", default="v3.0", type=str, help="Analysis version.",
@@ -74,14 +71,17 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     # check arguments
-    print("Running...")
-    print(f"SUBJ: {args.subj}")
-    print(f"SESSION: {args.sess}")
-    print(f"DAY: {args.day}")
-    print(f"NMAX: {args.nmax}")
-    print(f"VERSION: {args.version}")
+    # print("Running...")
+    # print(f"SUBJ: {args.subj}")
+    # print(f"SESSION: {args.sess}")
+    # print(f"DAY: {args.day}")
+    # print(f"NMIN: {args.nmin}"")
+    # print(f"NMAX: {args.nmax}")
+    # print(f"VERSION: {args.version}")
 
-    nfeature = RunNFeatures(args.subj, args.sess, args.day, args.nmax, args.version)
-    nfeature.run()
+    nfeature = RunNFeatures(
+        args.subj, args.sess, args.day, args.version
+    )
+    nfeature.run(args.nmin, args.nmax)
 
     print("Done.")
