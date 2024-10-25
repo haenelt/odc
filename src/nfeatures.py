@@ -36,13 +36,12 @@ class RunNFeatures:
         )
         self.dir_out.mkdir(parents=True, exist_ok=True)
 
-    def run(self, i_min, i_max):
+    def run(self, i):
         mvpa = RunMVPA(self.subj, self.seq, self.day, self.area, None, False)
-        with open(self.dir_out / f"accuracy_{i_min}_{i_max}.csv", "a") as f:
-            for i in range(i_min, i_max + 1):
-                mvpa.config["nmax"] = i
-                score = mvpa.decoding()
-                f.write(",".join(map(str, score)) + "\n")
+        mvpa.config["nmax"] = i
+        score = mvpa.decoding()
+        with open(self.dir_out / f"accuracy.csv", "a") as f:
+            f.write(f"{i},"+",".join(map(str, score)) + "\n")
 
 
 if __name__ == "__main__":
@@ -60,9 +59,6 @@ if __name__ == "__main__":
     )
     parser.add_argument("--day", dest="day", type=int, help="Session day (0 or 1).")
     parser.add_argument(
-        "--nmin", dest="nmin", default=1, type=int, help="Minimum feature number.",
-    )
-    parser.add_argument(
         "--nmax", dest="nmax", default=200, type=int, help="Maximum feature number.",
     )
     parser.add_argument(
@@ -75,11 +71,10 @@ if __name__ == "__main__":
     # print(f"SUBJ: {args.subj}")
     # print(f"SESSION: {args.sess}")
     # print(f"DAY: {args.day}")
-    # print(f"NMIN: {args.nmin}"")
     # print(f"NMAX: {args.nmax}")
     # print(f"VERSION: {args.version}")
 
     nfeature = RunNFeatures(args.subj, args.sess, args.day, args.version)
-    nfeature.run(args.nmin, args.nmax)
+    nfeature.run(args.nmax)
 
     print("Done.")
