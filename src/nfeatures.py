@@ -38,7 +38,7 @@ class RunNFeatures:
 
     def run(self, i):
         mvpa = RunMVPA(self.subj, self.seq, self.day, self.area, None, False)
-        mvpa.config["nmax"] = i
+        mvpa.config_model.nmax = i
         score = mvpa.decoding()
         with open(self.dir_out / f"accuracy.csv", "a") as f:
             f.write(f"{i},"+",".join(map(str, score)) + "\n")
