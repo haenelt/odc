@@ -66,6 +66,11 @@ class RunMVPA:
 
     @property
     @functools.lru_cache()
+    def n_surf(self):
+        return len(self.surf_data.file_layer["lh"])
+
+    @property
+    @functools.lru_cache()
     def preprocessing(self):
         # timeseries preprocessing
         preproc = TimeseriesPreproc.from_dict(self.config)
@@ -75,12 +80,11 @@ class RunMVPA:
         data_vol, events = preproc.crop_data(self.config_data.n_skip)
         return data_vol, events
 
-    def decoding(self, save=False):
-        data_vol, events = self.preprocessing
+    @functools.lru_cache()
+    def data_feature_sampled(self, data_vol):
         # get features from time series averaged across cortical depth
-        n_surf = len(self.surf_data.file_layer["lh"])
-        data_feature_sampled = {}
-        for i in range(n_surf):
+        _data = {}
+        for i in range(self.n_surf):
             for hemi in ["lh", "rh"]:
                 vtx, fac = self.surf_data.load_layer(hemi, i)
                 sampler = TimeseriesSampling(vtx, fac, data_vol)
@@ -88,32 +92,35 @@ class RunMVPA:
                 file_deformation = self.config_data.file_deformation
                 file_reference = self.time_data.file_series[0]
                 if i == 0:
-                    data_feature_sampled[hemi] = sampler.sample_timeseries(
+                    _data[hemi] = sampler.sample_timeseries(
                         file_deformation, file_reference
                     )
                 else:
                     _tmp = sampler.sample_timeseries(file_deformation, file_reference)
-                    data_feature_sampled[hemi] = [
-                        a + b for a, b in zip(data_feature_sampled[hemi], _tmp)
+                    _data[hemi] = [
+                        a + b for a, b in zip(_data[hemi], _tmp)
                     ]
 
         for hemi in ["lh", "rh"]:
-            data_feature_sampled[hemi] = [
-                data_feature_sampled[hemi][x] / n_surf
-                for x in range(len(data_feature_sampled[hemi]))
+            _data[hemi] = [
+                _data[hemi][x] / self.n_surf
+                for x in range(len(_data[hemi]))
             ]
 
         for hemi in ["lh", "rh"]:
             label = self.surf_data.load_label_intersection(hemi)
-            data_feature_sampled[hemi] = [
-                data_feature_sampled[hemi][x][label, :]
-                for x in range(len(data_feature_sampled[hemi]))
+            _data[hemi] = [
+                _data[hemi][x][label, :]
+                for x in range(len(_data[hemi]))
             ]
+        return _data
+
+    def decoding(self, save=False):
+        data_vol, events = self.preprocessing
 
         # iterate over surfaces (layers)
-        n_surf = len(self.surf_data.file_layer["lh"])
         score = np.zeros(N_LAYER)
-        for i in range(n_surf):
+        for i in range(self.n_surf):
             data_sampled = {}
             for hemi in ["lh", "rh"]:
                 vtx, fac = self.surf_data.load_layer(hemi, i)
@@ -137,7 +144,7 @@ class RunMVPA:
                 events,
                 nmax=self.config_model.nmax,
                 remove_nan=True,
-                data_feature=data_feature_sampled,
+                data_feature=self.data_feature_sampled(data_vol),
             )
 
             if self.verbose is True and self.dir_out is not None:
