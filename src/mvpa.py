@@ -144,7 +144,7 @@ class RunMVPA:
                 events,
                 nmax=self.config_model.nmax,
                 remove_nan=True,
-                data_feature=self.data_feature_sampled(data_vol),
+                data_feature=self.data_feature_sampled(tuple(data_vol)),
             )
 
             if self.verbose is True and self.dir_out is not None:
