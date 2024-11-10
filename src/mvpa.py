@@ -2,8 +2,10 @@
 """Run decoding analysis with feature selected from time series averaged across cortical
 depth. This was one of the main reviewer comments."""
 
+import os
 import functools
 from pathlib import Path
+from joblib import Memory
 import numpy as np
 
 from fmri_decoder.data import DataConfig, ModelConfig, SurfaceData, TimeseriesData
@@ -11,10 +13,12 @@ from fmri_decoder.model import ExternalFeatureMVPA
 from fmri_decoder.preprocessing import TimeseriesPreproc, TimeseriesSampling
 
 from src.data import Data
-from src.config import N_LAYER
+from src.config import N_LAYER, DIR_DATA
 
 __all__ = ["RunMVPA"]
 
+
+memory = Memory(location=os.path.join(DIR_DATA, "cache"), verbose=0)
 
 class RunMVPA:
     """Decoding analysis with shared features across cortical depth."""
@@ -80,7 +84,7 @@ class RunMVPA:
         data_vol, events = preproc.crop_data(self.config_data.n_skip)
         return data_vol, events
 
-    @functools.lru_cache()
+    @memory.cache
     def data_feature_sampled(self, data_vol):
         # get features from time series averaged across cortical depth
         _data = {}
@@ -144,7 +148,7 @@ class RunMVPA:
                 events,
                 nmax=self.config_model.nmax,
                 remove_nan=True,
-                data_feature=self.data_feature_sampled(tuple(data_vol)),
+                data_feature=self.data_feature_sampled(data_vol),
             )
 
             if self.verbose is True and self.dir_out is not None:
