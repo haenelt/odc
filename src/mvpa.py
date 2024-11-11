@@ -84,7 +84,6 @@ class RunMVPA:
         data_vol, events = preproc.crop_data(self.config_data.n_skip)
         return data_vol, events
 
-    @memory.cache
     def data_feature_sampled(self, data_vol):
         # get features from time series averaged across cortical depth
         _sess = Data(self.subj, self.seq, self.day, self.area).sess
