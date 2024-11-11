@@ -5,7 +5,6 @@ depth. This was one of the main reviewer comments."""
 import os
 import functools
 from pathlib import Path
-from joblib import Memory
 import numpy as np
 
 from fmri_decoder.data import DataConfig, ModelConfig, SurfaceData, TimeseriesData
@@ -18,7 +17,8 @@ from src.config import N_LAYER, DIR_DATA
 __all__ = ["RunMVPA"]
 
 
-memory = Memory(location=os.path.join(DIR_DATA, "cache"), verbose=0)
+DIR_CACHE = os.path.join(DIR_DATA, "cache")
+
 
 class RunMVPA:
     """Decoding analysis with shared features across cortical depth."""
@@ -87,37 +87,48 @@ class RunMVPA:
     @memory.cache
     def data_feature_sampled(self, data_vol):
         # get features from time series averaged across cortical depth
-        _data = {}
-        for i in range(self.n_surf):
+        _sess = Data(self.subj, self.seq, self.day, self.area).sess
+        _file_data = Path(DIR_CACHE) / f"data_feature_sampled_{self.subj}_{_sess}.npy"
+
+        if _file_data.is_file():
+            return np.load(_file_data, allow_pickle=True).item()
+        else:
+            _data = {}
+            for i in range(self.n_surf):
+                for hemi in ["lh", "rh"]:
+                    vtx, fac = self.surf_data.load_layer(hemi, i)
+                    sampler = TimeseriesSampling(vtx, fac, data_vol)
+                    # sample time series
+                    file_deformation = self.config_data.file_deformation
+                    file_reference = self.time_data.file_series[0]
+                    if i == 0:
+                        _data[hemi] = sampler.sample_timeseries(
+                            file_deformation, file_reference
+                        )
+                    else:
+                        _tmp = sampler.sample_timeseries(file_deformation, file_reference)
+                        _data[hemi] = [
+                            a + b for a, b in zip(_data[hemi], _tmp)
+                        ]
+
             for hemi in ["lh", "rh"]:
-                vtx, fac = self.surf_data.load_layer(hemi, i)
-                sampler = TimeseriesSampling(vtx, fac, data_vol)
-                # sample time series
-                file_deformation = self.config_data.file_deformation
-                file_reference = self.time_data.file_series[0]
-                if i == 0:
-                    _data[hemi] = sampler.sample_timeseries(
-                        file_deformation, file_reference
-                    )
-                else:
-                    _tmp = sampler.sample_timeseries(file_deformation, file_reference)
-                    _data[hemi] = [
-                        a + b for a, b in zip(_data[hemi], _tmp)
-                    ]
+                _data[hemi] = [
+                    _data[hemi][x] / self.n_surf
+                    for x in range(len(_data[hemi]))
+                ]
 
-        for hemi in ["lh", "rh"]:
-            _data[hemi] = [
-                _data[hemi][x] / self.n_surf
-                for x in range(len(_data[hemi]))
-            ]
+            for hemi in ["lh", "rh"]:
+                label = self.surf_data.load_label_intersection(hemi)
+                _data[hemi] = [
+                    _data[hemi][x][label, :]
+                    for x in range(len(_data[hemi]))
+                ]
 
-        for hemi in ["lh", "rh"]:
-            label = self.surf_data.load_label_intersection(hemi)
-            _data[hemi] = [
-                _data[hemi][x][label, :]
-                for x in range(len(_data[hemi]))
-            ]
-        return _data
+            # save dictionary to disk
+            _file_data.parent.mkdir(parents=True, exist_ok=True)
+            np.save(_file_data, _data)
+
+            return _data
 
     def decoding(self, save=False):
         data_vol, events = self.preprocessing
