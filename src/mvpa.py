@@ -128,6 +128,31 @@ class RunMVPA:
             np.save(_file_data, _data)
 
             return _data
+    
+    def data_sampling(self, data_vol, layer):
+        # sample time series data to surface
+        _sess = Data(self.subj, self.seq, self.day, self.area).sess
+        _file_data = Path(DIR_CACHE) / f"data_sampled_{self.subj}_{_sess}_layer{layer}.npy"
+
+        if _file_data.is_file():
+            return np.load(_file_data, allow_pickle=True).item()
+        else:
+            _data_sampled = {}
+            for hemi in ["lh", "rh"]:
+                vtx, fac = self.surf_data.load_layer(hemi, layer)
+                sampler = TimeseriesSampling(vtx, fac, data_vol)
+                # sample time series
+                file_deformation = self.config_data.file_deformation
+                file_reference = self.time_data.file_series[0]
+                _data_sampled[hemi] = sampler.sample_timeseries(
+                    file_deformation, file_reference
+                )
+
+            # save dictionary to disk
+            _file_data.parent.mkdir(parents=True, exist_ok=True)
+            np.save(_file_data, _data_sampled)
+
+            return _data_sampled
 
     def decoding(self, save=False):
         data_vol, events = self.preprocessing
@@ -135,16 +160,7 @@ class RunMVPA:
         # iterate over surfaces (layers)
         score = np.zeros(N_LAYER)
         for i in range(self.n_surf):
-            data_sampled = {}
-            for hemi in ["lh", "rh"]:
-                vtx, fac = self.surf_data.load_layer(hemi, i)
-                sampler = TimeseriesSampling(vtx, fac, data_vol)
-                # sample time series
-                file_deformation = self.config_data.file_deformation
-                file_reference = self.time_data.file_series[0]
-                data_sampled[hemi] = sampler.sample_timeseries(
-                    file_deformation, file_reference
-                )
+            data_sampled = self.data_sampling(data_vol, i)
 
             for hemi in ["lh", "rh"]:
                 label = self.surf_data.load_label_intersection(hemi)
