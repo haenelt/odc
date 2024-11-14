@@ -75,19 +75,30 @@ class RunMVPA:
 
     @property
     @functools.lru_cache()
+    def sess(self):
+        return Data(self.subj, self.seq, self.day, self.area).sess
+
+    @property
     def preprocessing(self):
-        # timeseries preprocessing
-        preproc = TimeseriesPreproc.from_dict(self.config)
-        # detrend time series
-        _ = preproc.detrend_timeseries(self.config_data.tr, self.config_data.cutoff_sec)
-        # crop time series
-        data_vol, events = preproc.crop_data(self.config_data.n_skip)
-        return data_vol, events
+        # get preprocessed volumetric time series and task events
+        _file_vol = Path(DIR_CACHE) / f"data_vol_{self.subj}_{self.sess}.npy"
+        _file_events = Path(DIR_CACHE) / f"events_{self.subj}_{self.sess}.npy"
+
+        if _file_vol.is_file() and _file_events.is_file():
+            _data_vol = np.load(_file_vol, allow_pickle=True).item()
+            _events = np.load(_file_events, allow_pickle=True).item()
+            return _data_vol, _events
+        else:
+            preproc = TimeseriesPreproc.from_dict(self.config)
+            # detrend time series
+            _ = preproc.detrend_timeseries(self.config_data.tr, self.config_data.cutoff_sec)
+            # crop time series
+            _data_vol, _events = preproc.crop_data(self.config_data.n_skip)
+            return _data_vol, _events
 
     def data_feature_sampled(self, data_vol):
         # get features from time series averaged across cortical depth
-        _sess = Data(self.subj, self.seq, self.day, self.area).sess
-        _file_data = Path(DIR_CACHE) / f"data_feature_sampled_{self.subj}_{_sess}.npy"
+        _file_data = Path(DIR_CACHE) / f"data_feature_sampled_{self.subj}_{self.sess}.npy"
 
         if _file_data.is_file():
             return np.load(_file_data, allow_pickle=True).item()
@@ -131,8 +142,7 @@ class RunMVPA:
     
     def data_sampling(self, data_vol, layer):
         # sample time series data to surface
-        _sess = Data(self.subj, self.seq, self.day, self.area).sess
-        _file_data = Path(DIR_CACHE) / f"data_sampled_{self.subj}_{_sess}_layer{layer}.npy"
+        _file_data = Path(DIR_CACHE) / f"data_sampled_{self.subj}_{self.sess}_layer{layer}.npy"
 
         if _file_data.is_file():
             return np.load(_file_data, allow_pickle=True).item()
@@ -148,6 +158,13 @@ class RunMVPA:
                     file_deformation, file_reference
                 )
 
+            for hemi in ["lh", "rh"]:
+                label = self.surf_data.load_label_intersection(hemi)
+                _data_sampled[hemi] = [
+                    _data_sampled[hemi][x][label, :]
+                    for x in range(len(_data_sampled[hemi]))
+                ]
+
             # save dictionary to disk
             _file_data.parent.mkdir(parents=True, exist_ok=True)
             np.save(_file_data, _data_sampled)
@@ -161,13 +178,6 @@ class RunMVPA:
         score = np.zeros(N_LAYER)
         for i in range(self.n_surf):
             data_sampled = self.data_sampling(data_vol, i)
-
-            for hemi in ["lh", "rh"]:
-                label = self.surf_data.load_label_intersection(hemi)
-                data_sampled[hemi] = [
-                    data_sampled[hemi][x][label, :]
-                    for x in range(len(data_sampled[hemi]))
-                ]
 
             mvpa = ExternalFeatureMVPA.from_data(
                 data_sampled,
