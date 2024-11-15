@@ -85,8 +85,8 @@ class RunMVPA:
         _file_events = Path(DIR_CACHE) / f"events_{self.subj}_{self.sess}.npy"
 
         if _file_vol.is_file() and _file_events.is_file():
-            _data_vol = np.load(_file_vol, allow_pickle=True).item()
-            _events = np.load(_file_events, allow_pickle=True).item()
+            _data_vol = np.load(_file_vol, allow_pickle=True)
+            _events = np.load(_file_events, allow_pickle=True)
             return _data_vol, _events
         else:
             preproc = TimeseriesPreproc.from_dict(self.config)
@@ -94,6 +94,12 @@ class RunMVPA:
             _ = preproc.detrend_timeseries(self.config_data.tr, self.config_data.cutoff_sec)
             # crop time series
             _data_vol, _events = preproc.crop_data(self.config_data.n_skip)
+
+            # save dictionary to disk
+            _file_vol.parent.mkdir(parents=True, exist_ok=True)
+            np.save(_file_vol, _data_vol)
+            np.save(_file_events, _events)
+
             return _data_vol, _events
 
     def data_feature_sampled(self, data_vol):
