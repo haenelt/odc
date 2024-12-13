@@ -110,6 +110,9 @@ def _main(dir_out, sess, area, sigma, nmax, version):
     elif sess == "SE_EPI":
         contour_range = [2.0, 2.6]
         clim_range = [0, 3.0]
+    elif sess == "VASO_uncorrected":
+        contour_range [2.4, 3.4]
+        clim_range = [0, 5]
 
     fig, ax = plt.subplots()
     im = ax.imshow(data_filtered, cmap=ColMap.mpl_colormap)
@@ -150,13 +153,14 @@ if __name__ == "__main__":
     parser.add_argument(
         "--sigma",
         dest="sigma",
+        default=1.0,
         type=float,
         help="Size of gaussian filter.",
     )
     parser.add_argument(
         "--nmax",
         dest="nmax",
-        default=200,
+        default=500,
         type=int,
         help="Number of features.",
     )

@@ -24,7 +24,10 @@ class Data:
     @property
     def sess(self):
         """Session name."""
-        return f"{self.sequence}{SESSION[self.subj][self.sequence][self.day]}"
+        if self.sequence == "VASO_uncorrected":
+            return f"VASO{SESSION[self.subj][self.sequence][self.day]}_uncorrected"
+        else:
+            return f"{self.sequence}{SESSION[self.subj][self.sequence][self.day]}"
 
     @property
     def surfaces(self):
@@ -151,13 +154,14 @@ class Data:
     def get_sample_data(self, layer, version):
         """Load sample data from MVPA analysis."""
         _dirname = "bandpass_none" if version == "v1.0" else f"{self.area}_bandpass_none"
+        _sess = f"{self.sequence}{SESSION[self.subj][self.sequence][self.day]}"
         file_ = (
             Path(DIR_BASE)
             / "paper"
             / version
             / "decoding"
             / self.subj
-            / self.sess
+            / _sess
             / _dirname
             / "sample"
             / f"sample_data_{layer}.parquet"

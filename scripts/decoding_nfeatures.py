@@ -47,6 +47,9 @@ def _main(dir_out, sess, part, sigma, version):
     elif sess == "SE_EPI":
         cs = ax.contour(x, y, data_filtered, [72.0, 75.0], colors="black", linewidths=1.0)  # se_epi
         im.set_clim([67, 77])
+    elif sess == "VASO_uncorrected":
+        cs = ax.contour(x, y, data_filtered, [86.0, 88.0], colors="black", linewidths=1.0)  # se_epi
+        im.set_clim([79, 89])
     ax.clabel(cs, inline=True, fontsize=16)
     ax.set_xticks([0, 125, 250], [0.0, 0.5, 1.0])
     ax.set_xlabel(r"GM/WM $\rightarrow$ GM/CSF")
@@ -81,6 +84,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--sigma",
         dest="sigma",
+        default=1.0,
         type=float,
         help="Size of gaussian filter.",
     )
