@@ -111,7 +111,7 @@ def _main(dir_out, sess, area, sigma, nmax, version):
         contour_range = [2.0, 2.6]
         clim_range = [0, 3.0]
     elif sess == "VASO_uncorrected":
-        contour_range [2.4, 3.4]
+        contour_range = [2.4, 3.4]
         clim_range = [0, 5]
 
     fig, ax = plt.subplots()
