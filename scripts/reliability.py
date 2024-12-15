@@ -94,12 +94,14 @@ if __name__ == "__main__":
     parser.add_argument(
         "--frac",
         dest="frac",
+        default=0.1,
         type=float,
         help="Fraction of data used for permutation testing.",
     )
     parser.add_argument(
         "--n_shuffle",
         dest="n_shuffle",
+        default=1000,
         type=int,
         help="Number of permutation iterations.",
     )
