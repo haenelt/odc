@@ -5,6 +5,8 @@ import re
 from dataclasses import dataclass
 from pathlib import Path
 
+import numpy as np
+from nibabel.freesurfer.io import read_geometry
 from fmri_tools.io.surf import read_mgh
 
 from .config import DIR_BASE, N_LAYER, N_RUN, SESSION
@@ -257,3 +259,11 @@ class Data:
             / f"{hemi}.nssw_layer_{layer}.mgh"
         )
         return read_mgh(file_)[0]
+    
+    def get_thickness(self, hemi):
+        """Compute cortical thickness."""
+        file_wm = self.surfaces[hemi][0]
+        file_pial = self.surfaces[hemi][10]
+        vtx_wm, _ = read_geometry(file_wm)
+        vtx_pial, _= read_geometry(file_pial)
+        return np.linalg.norm(vtx_pial - vtx_wm, axis=1)
