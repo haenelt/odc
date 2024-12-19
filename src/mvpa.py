@@ -210,16 +210,12 @@ class RunMVPA:
 
             # save output
             if self.dir_out is not None:
-                self.save()
+                mvpa.save_results(self.dir_out / "accuracy.csv", "accuracy")
+                mvpa.save_results(self.dir_out / "sensitivity.csv", "sensitivity")
+                mvpa.save_results(self.dir_out / "specificity.csv", "specificity")
+                mvpa.save_results(self.dir_out / "f1.csv", "f1")
 
         return score
-
-    def save(self):
-        # save results
-        mvpa.save_results(self.dir_out / "accuracy.csv", "accuracy")
-        mvpa.save_results(self.dir_out / "sensitivity.csv", "sensitivity")
-        mvpa.save_results(self.dir_out / "specificity.csv", "specificity")
-        mvpa.save_results(self.dir_out / "f1.csv", "f1")
 
 
 if __name__ == "__main__":
