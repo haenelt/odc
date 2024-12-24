@@ -63,7 +63,7 @@ def get_nprofile(sess, day, version):
 
 def get_univariate_profile(sess, day, area, nmax, version):
     """Get percent signal change across cortical depth."""
-    if version not in ["v1.0", "v2.0", "v3.0"]:
+    if version not in ["v1.0", "v2.0", "v3.0", "v4.0", "v5.0", "v6.0"]:
         raise ValueError("Unknown version!")
 
     y = np.zeros((N_LAYER, len(SUBJECTS)))
@@ -71,7 +71,7 @@ def get_univariate_profile(sess, day, area, nmax, version):
         label, hemi = get_label(subj, area)
         _data = Data(subj, sess, day, area)
 
-        if version == "v3.0":
+        if version in ["v3.0"]:
             label_selected, hemi_selected = mean_roi(
                 subj, sess, day, area, label, hemi, nmax, version
             )
@@ -80,6 +80,18 @@ def get_univariate_profile(sess, day, area, nmax, version):
             if version == "v2.0" or version == "v1.0":
                 label_selected, hemi_selected = layer_roi(
                     subj, sess, day, area, label, hemi, j, nmax, version
+                )
+            elif version == "v4.0":
+                label_selected, hemi_selected = layer_roi(
+                    subj, sess, day, area, label, hemi, 0, nmax, version
+                )
+            elif version == "v5.0":
+                label_selected, hemi_selected = layer_roi(
+                    subj, sess, day, area, label, hemi, 5, nmax, version
+                )
+            elif version == "v6.0":
+                label_selected, hemi_selected = layer_roi(
+                    subj, sess, day, area, label, hemi, 10, nmax, version
                 )
             arr_left = _data.get_psc("lh", j)
             arr_right = _data.get_psc("rh", j)
